@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS User (
     email VARCHAR(100) NOT NULL UNIQUE,
     passwordHash VARCHAR(255) NOT NULL,
     isActiveted BOOLEAN NOT NULL DEFAULT FALSE,
-    activationHash VARCHAR(255) NOT NULL
+    activationHash VARCHAR(255) NOT NULL,
+    resetHash VARCHAR(255) DEFAULT NULL,
+    resetExpires DATETIME DEFAULT NULL
 );
 
 -- Image

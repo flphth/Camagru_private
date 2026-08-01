@@ -1,32 +1,26 @@
-if (typeof loginForm === 'undefined') {
+if (typeof resetForm === 'undefined') {
 
-    const loginForm = document.getElementById('login');
+    const resetForm = document.getElementById('reset');
     const messageElement = document.getElementById('message');
+    const hash = new URLSearchParams(window.location.search).get('hash');
 
-    loginForm.addEventListener('submit', async (event) => {
+    resetForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
 
-        const response = await fetch('/api/account/login/', {
+        const response = await fetch('/api/account/resetPassword/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ hash, password })
         });
 
         const data = await response.json();
         messageElement.textContent = data.message;
         messageElement.classList.remove('text-success', 'text-error');
         messageElement.classList.add(data.status === 'success' ? 'text-success' : 'text-error');
-
-        if (data.status === 'success') {
-            storeToken(data.token);
-            renderNav();
-            navigate(event, 'list');
-        }
     });
 
 }

@@ -28,6 +28,32 @@ async function fetchWithAuth(url, options = {}) {
     }
 }
 
+// Render the header links depending on the connection state
+function renderNav() {
+    const nav = document.getElementById('nav-links');
+    if (!nav) return;
+
+    if (getToken()) {
+        nav.innerHTML =
+            '<a href="/list" onclick="navigate(event, \'list\')" class="btn btn-link">Gallery</a>' +
+            '<a href="/home" onclick="navigate(event, \'home\')" class="btn btn-link">Editing</a>' +
+            '<a href="/profile" onclick="navigate(event, \'profile\')" class="btn btn-link">Profile</a>' +
+            '<a href="/logout" onclick="logout(event)" class="btn btn-primary">Logout</a>';
+    } else {
+        nav.innerHTML =
+            '<a href="/list" onclick="navigate(event, \'list\')" class="btn btn-link">Gallery</a>' +
+            '<a href="/register" onclick="navigate(event, \'register\')" class="btn btn-link">Register</a>' +
+            '<a href="/login" onclick="navigate(event, \'login\')" class="btn btn-primary">Login</a>';
+    }
+}
+
+function logout(event) {
+    event.preventDefault();
+    localStorage.removeItem('authToken');
+    renderNav();
+    navigate(event, 'list');
+}
+
 // One page navigation block
 function navigate(event, page) {
     event.preventDefault();
@@ -41,6 +67,7 @@ window.onpopstate = function () {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    renderNav();
     const initialPage = window.location.pathname.split('/')[1] || 'home';
     loadContent(initialPage);
 });
@@ -69,6 +96,18 @@ function loadContent(page) {
             } else if (page === 'activate') {
                 const script = document.createElement('script');
                 script.src = '/js/activate.js';
+                document.body.appendChild(script);
+            } else if (page === 'forgot') {
+                const script = document.createElement('script');
+                script.src = '/js/forgot.js';
+                document.body.appendChild(script);
+            } else if (page === 'reset') {
+                const script = document.createElement('script');
+                script.src = '/js/reset.js';
+                document.body.appendChild(script);
+            } else if (page === 'profile') {
+                const script = document.createElement('script');
+                script.src = '/js/profile.js';
                 document.body.appendChild(script);
             }
         })
