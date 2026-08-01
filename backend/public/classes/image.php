@@ -18,49 +18,60 @@ class Image
         $json = file_get_contents('php://input');
         $data = json_decode($json);
 
-        if ($data && isset($data->image)) {
-
-            // Get image data
-            $imageData = $data->image;
-            $stickersId = $data->stickersId;
-
-            // Remove data URL scheme part
-            $imageData = str_replace('data:image/png;base64,', '', $imageData);
-            $imageData = str_replace(' ', '+', $imageData);
-
-            // Decode base64 image data
-            $imageBinary = base64_decode($imageData);
-
-            // Save image to file
-            $filePath = getcwd() . '/static/'; 
-            $fileName = 'image_' . uniqid() . '.png';
-            $fullPath = $filePath . $fileName;
-            $bytesWritten = file_put_contents($fullPath, $imageBinary);
-
-            if ($bytesWritten !== false) {
-                
-                // Load webcam image
-                $webcamImage = imagecreatefrompng($fullPath);
-                if (!empty($stickersId)) {
-                    $stickerPaths = $this->getStickerPaths($stickersId);
-                    // Merge webcam image with stickers
-                    foreach ($stickerPaths as $stickerPath) {
-                        $stickerImage = imagecreatefrompng($stickerPath);
-                        imagecopy($webcamImage, $stickerImage, 0, 0, 0, 0, imagesx($stickerImage), imagesy($stickerImage));
-                        imagedestroy($stickerImage);
-                    }
-                }
-
-                // Save merged image
-                imagepng($webcamImage, $fullPath);
-                imagedestroy($webcamImage);
-
-            } else {
-                return ["status" => "error", "message" => "Failed to save image to file."];
-            }
-        } else {
+        if (!$data || !isset($data->image)) {
             return ["status" => "error", "message" => "Invalid image data."];
         }
+
+        // Normalise the base64 payload
+        $imageData = $data->image;
+        $stickersId = $data->stickersId ?? [];
+
+        $imageData = str_replace('data:image/png;base64,', '', $imageData);
+        $imageData = str_replace(' ', '+', $imageData);
+
+        $imageBinary = base64_decode($imageData, true);
+        if ($imageBinary === false) {
+            return ["status" => "error", "message" => "Invalid image data."];
+        }
+
+        // Enforce a size limit (5 MB)
+        if (strlen($imageBinary) > 5 * 1024 * 1024) {
+            return ["status" => "error", "message" => "Image is too large."];
+        }
+
+        // Make sure the payload really is a PNG image before touching the filesystem
+        $info = @getimagesizefromstring($imageBinary);
+        if ($info === false || $info[2] !== IMAGETYPE_PNG) {
+            return ["status" => "error", "message" => "Only PNG images are allowed."];
+        }
+
+        $webcamImage = @imagecreatefromstring($imageBinary);
+        if ($webcamImage === false) {
+            return ["status" => "error", "message" => "Invalid image data."];
+        }
+
+        // Merge with the selected stickers
+        if (!empty($stickersId)) {
+            $stickerPaths = $this->getStickerPaths($stickersId);
+            foreach ($stickerPaths as $stickerPath) {
+                $stickerImage = @imagecreatefrompng($stickerPath);
+                if ($stickerImage === false) {
+                    continue;
+                }
+                imagecopy($webcamImage, $stickerImage, 0, 0, 0, 0, imagesx($stickerImage), imagesy($stickerImage));
+                imagedestroy($stickerImage);
+            }
+        }
+
+        // Save the final image (only validated content is ever written to disk)
+        $fileName = 'image_' . uniqid() . '.png';
+        $fullPath = getcwd() . '/static/' . $fileName;
+
+        if (!imagepng($webcamImage, $fullPath)) {
+            imagedestroy($webcamImage);
+            return ["status" => "error", "message" => "Failed to save image."];
+        }
+        imagedestroy($webcamImage);
 
         // Add image in database
         $pdo = Database::getPDO();

@@ -15,7 +15,8 @@ class Database
             self::$pdo = new PDO("mysql:host=$host;dbname=$dbname", $user, $password);
             self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+            error_log('Database connection error: ' . $e->getMessage());
+            throw new RuntimeException('Database connection failed.');
         }
     }
 

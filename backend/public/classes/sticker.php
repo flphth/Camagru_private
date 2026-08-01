@@ -23,7 +23,8 @@ class Sticker
                 return ["status" => "error", "message" => "No stickers found"];
             }
         } catch (PDOException $e) {
-            return ["status" => "error", "message" => "Database query error: " . $e->getMessage()];
+            error_log('Sticker query error: ' . $e->getMessage());
+            return ["status" => "error", "message" => "Unable to load stickers."];
         }
     }
 }
