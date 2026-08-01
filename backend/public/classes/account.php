@@ -58,8 +58,8 @@ class Account
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if ($user && password_verify($data->password, $user['passwordHash'])) {
-            // Check if the user is authenticated
-            if ($user['isActiveted'] === 0) { // todo delete false
+            // Check if the account has been activated
+            if ((int)$user['isActiveted'] === 1) {
 
                 // Activate cross import
                 $jwt = new JWT(1);

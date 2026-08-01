@@ -17,10 +17,17 @@ async function displayComment(imageId) {
             const commentsContainer = document.getElementById(`comments-${imageId}`);
             const commentElement = document.createElement('div');
             commentElement.classList.add('comment');
-            commentElement.innerHTML = `
-                <div class="comment-content">${content}</div>
-                <div class="comment-date text-gray">Just now</div>
-            `;
+
+            const commentContent = document.createElement('div');
+            commentContent.classList.add('comment-content');
+            commentContent.textContent = content;
+
+            const commentDate = document.createElement('div');
+            commentDate.classList.add('comment-date', 'text-gray');
+            commentDate.textContent = 'Just now';
+
+            commentElement.appendChild(commentContent);
+            commentElement.appendChild(commentDate);
             commentsContainer.appendChild(commentElement);
             contentElement.value = '';
         } else {
@@ -157,10 +164,17 @@ if (typeof list === 'undefined') {
                 data.comments.forEach(comment => {
                     const commentElement = document.createElement('div');
                     commentElement.classList.add('comment');
-                    commentElement.innerHTML = `
-                        <div class="comment-content">${comment.content}</div>
-                        <div class="comment-date text-gray">${comment.createdAt}</div>
-                    `;
+
+                    const commentContent = document.createElement('div');
+                    commentContent.classList.add('comment-content');
+                    commentContent.textContent = comment.content;
+
+                    const commentDate = document.createElement('div');
+                    commentDate.classList.add('comment-date', 'text-gray');
+                    commentDate.textContent = comment.createdAt;
+
+                    commentElement.appendChild(commentContent);
+                    commentElement.appendChild(commentDate);
                     commentsContainer.appendChild(commentElement);
                 });
             } else {

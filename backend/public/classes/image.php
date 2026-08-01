@@ -102,9 +102,12 @@ class Image
     // Get sticker paths from database
     private function getStickerPaths($stickersId)
     {
+        $ids = array_map('intval', (array)$stickersId);
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
         $pdo = Database::getPDO();
-        $stmt = $pdo->prepare('SELECT imagePath FROM Sticker WHERE id IN (' . implode(',', $stickersId) . ')');
-        $stmt->execute();
+        $stmt = $pdo->prepare('SELECT imagePath FROM Sticker WHERE id IN (' . $placeholders . ')');
+        $stmt->execute($ids);
         $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         $stickerPaths = [];
