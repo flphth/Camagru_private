@@ -1,6 +1,7 @@
 <?php
 
 require_once './jwt.php';
+require_once './mailer.php';
 
 class Account
 {
@@ -32,6 +33,7 @@ class Account
             $userId = $pdo->lastInsertId();
     
             if ($userId > 0) {
+                $this->sendActivationEmail($data->email, $activationHash);
                 return ["status" => "success", "message" => "Registration successful. Please check your email to activate your account."];
             } else {
                 return ["status" => "error", "message" => "Failed to register user."];
@@ -78,6 +80,49 @@ class Account
         } else {
             return ["status" => "error", "message" => "Invalid email or password."];
         }
+    }
+
+    public function activate($token, $param)
+    {
+        $hash = $param;
+
+        if (!$hash || !preg_match('/^[a-f0-9]{32}$/', $hash)) {
+            return ["status" => "error", "message" => "Invalid activation link."];
+        }
+
+        $pdo = Database::getPDO();
+        $stmt = $pdo->prepare('SELECT id, isActiveted FROM User WHERE activationHash = :hash');
+        $stmt->execute(['hash' => $hash]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return ["status" => "error", "message" => "Invalid activation link."];
+        }
+
+        if ((int)$user['isActiveted'] === 1) {
+            return ["status" => "success", "message" => "Account already activated. You can log in."];
+        }
+
+        $stmt = $pdo->prepare('UPDATE User SET isActiveted = 1 WHERE id = :id');
+        $stmt->execute(['id' => $user['id']]);
+
+        return ["status" => "success", "message" => "Account activated. You can now log in."];
+    }
+
+    private function sendActivationEmail($email, $activationHash)
+    {
+        $appUrl = getenv('APP_URL') ?: 'http://localhost:8080';
+        $link = $appUrl . '/activate?hash=' . $activationHash;
+
+        $subject = 'Activate your Camagru account';
+        $body = '<p>Welcome to Camagru!</p>'
+            . '<p>Please activate your account by clicking the link below:</p>'
+            . '<p><a href="' . $link . '">' . $link . '</a></p>';
+
+        // Keep the link retrievable during development even without a configured SMTP relay
+        error_log('Camagru activation link for ' . $email . ': ' . $link);
+
+        Mailer::send($email, $subject, $body);
     }
 
     public function getUser($token) {
