@@ -8,6 +8,7 @@ if (typeof profileForm === 'undefined') {
         if (data.status === 'success' && data.user) {
             document.getElementById('username').value = data.user.username;
             document.getElementById('email').value = data.user.email;
+            document.getElementById('notifyOnComment').checked = Number(data.user.notifyOnComment) === 1;
         } else {
             messageElement.textContent = 'You must be logged in.';
             messageElement.classList.add('text-error');
@@ -20,13 +21,14 @@ if (typeof profileForm === 'undefined') {
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const notifyOnComment = document.getElementById('notifyOnComment').checked;
 
         const data = await fetchWithAuth('/api/account/update/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username, email, password })
+            body: JSON.stringify({ username, email, password, notifyOnComment })
         });
 
         messageElement.textContent = data.message;

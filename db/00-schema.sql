@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS User (
     isActiveted BOOLEAN NOT NULL DEFAULT FALSE,
     activationHash VARCHAR(255) NOT NULL,
     resetHash VARCHAR(255) DEFAULT NULL,
-    resetExpires DATETIME DEFAULT NULL
+    resetExpires DATETIME DEFAULT NULL,
+    notifyOnComment BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- Image

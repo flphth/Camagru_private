@@ -19,7 +19,8 @@ body {
     background-color: #5855d982;
     color: white;
     text-align: center;
-    padding: 12px;
+    padding: 7px;
+    font-size: 0.8rem;
 }
 
 /* Navi */
@@ -74,4 +75,13 @@ body {
     max-width: 600px;
     margin: auto;
     margin-top: 10px;
+}
+
+/* Pagination */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
 }

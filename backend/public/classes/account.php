@@ -211,7 +211,7 @@ class Account
         }
 
         $pdo = Database::getPDO();
-        $stmt = $pdo->prepare('SELECT username, email FROM User WHERE id = :id');
+        $stmt = $pdo->prepare('SELECT username, email, notifyOnComment FROM User WHERE id = :id');
         $stmt->execute(['id' => $userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -254,6 +254,11 @@ class Account
             }
             $fields[] = 'passwordHash = :passwordHash';
             $params['passwordHash'] = password_hash($data->password, PASSWORD_DEFAULT);
+        }
+
+        if (isset($data->notifyOnComment)) {
+            $fields[] = 'notifyOnComment = :notifyOnComment';
+            $params['notifyOnComment'] = $data->notifyOnComment ? 1 : 0;
         }
 
         if (empty($fields)) {

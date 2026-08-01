@@ -111,15 +111,33 @@ class Image
         }
     }
 
-    public function getAll() {
+    public function getAll($token, $param)
+    {
+        $perPage = 5;
+        $page = max(1, (int)$param);
+        $offset = ($page - 1) * $perPage;
 
         $pdo = Database::getPDO();
-        $stmt = $pdo->prepare('SELECT * FROM Image');
-        $stmt->execute();
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        
-        return $results;
+        $total = (int)$pdo->query('SELECT COUNT(*) FROM Image')->fetchColumn();
+
+        // Newest first; $perPage and $offset are validated integers
+        $stmt = $pdo->prepare(
+            'SELECT Image.id, Image.imagePath, Image.createdAt, User.username
+             FROM Image JOIN User ON Image.userId = User.id
+             ORDER BY Image.createdAt DESC, Image.id DESC
+             LIMIT ' . $perPage . ' OFFSET ' . $offset
+        );
+        $stmt->execute();
+        $images = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            "status" => "success",
+            "images" => $images,
+            "page" => $page,
+            "totalPages" => (int)ceil($total / $perPage),
+            "total" => $total
+        ];
     }
 
     // Get sticker paths from database
