@@ -1,3 +1,27 @@
+/* Layout: header + main + footer, footer stuck to the bottom */
+html, body {
+    min-height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+#content {
+    flex: 1;
+}
+
+/* Footer */
+.footer {
+    background-color: #5855d982;
+    color: white;
+    text-align: center;
+    padding: 12px;
+}
+
 /* Navi */
 .navbar {
     background-color: #5855d982;

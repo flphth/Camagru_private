@@ -7,6 +7,19 @@ if (typeof video === 'undefined') {
     const uploadButton = document.getElementById('uploadImage');
     let overlayStickers = [];
 
+    // Capture stays disabled until a superposable image is selected
+    uploadButton.disabled = true;
+
+    // The editing page is reserved to connected users
+    (async () => {
+        const auth = await fetchWithAuth('/api/account/check/');
+        if (!auth || auth.status !== 'connected') {
+            alert('You must be logged in to access the editing page.');
+            history.pushState(null, '', '/login');
+            loadContent('login');
+        }
+    })();
+
     // Request access to the webcam
     navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
@@ -16,12 +29,13 @@ if (typeof video === 'undefined') {
             console.error('Webcam access error:', error);
         });
 
-    // Deselect the currently overlaid image
+    // Deselect all overlaid stickers
     deselectButton.addEventListener('click', () => {
         overlayStickers = [];
+        uploadButton.disabled = true;
     });
 
-    // Function to load an image from a specified source and overlay or remove it from the canvas
+    // Overlay or remove a sticker on the preview
     function toggleImage(source, id) {
         const img = new Image();
         img.id = id;
@@ -32,50 +46,56 @@ if (typeof video === 'undefined') {
             } else {
                 overlayStickers.push(img);
             }
+            uploadButton.disabled = overlayStickers.length === 0;
         };
         img.src = source;
     }
 
-    // Function to capture the current image from the canvas and send it via POST
+    // Capture the current frame and send it to the server for merging
     async function uploadImage() {
+        if (overlayStickers.length === 0) {
+            alert('Please select a sticker first.');
+            return;
+        }
+
+        const width = canvas.width || video.videoWidth;
+        const height = canvas.height || video.videoHeight;
+        if (!width || !height) {
+            alert('Webcam is not ready yet. Please allow camera access and try again.');
+            return;
+        }
+
         try {
-            // Create a copy of the canvas without the stickers
             const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = canvas.width;
-            tempCanvas.height = canvas.height;
-            const tempContext = tempCanvas.getContext('2d');
-            tempContext.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            tempCanvas.getContext('2d').drawImage(video, 0, 0, width, height);
 
-            // Capture the image from the temporary canvas in base64 format
             const imageData = tempCanvas.toDataURL('image/png');
-
-            // Get the IDs of the selected stickers
             const selectedStickersIds = overlayStickers.map(img => img.id);
 
-            // Send the image and the IDs of the selected stickers via a POST request
-            const response = await fetchWithAuth('./api/image/upload/', {
+            const data = await fetchWithAuth('/api/image/upload/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ image: imageData, stickersId: selectedStickersIds })
             });
 
-            if (response.status !== "success") {
-                throw new Error();
+            if (data && data.status === 'success') {
+                alert('Image uploaded successfully!');
+            } else {
+                alert((data && data.message) ? data.message : 'Image upload error. Please try again.');
             }
-            alert('Image uploaded successfully!');
         } catch (error) {
-            console.error('Image upload error:', error);
             alert('Image upload error. Please try again.');
         }
     }
 
+    // Load the superposable stickers
     async function stickerInjector() {
-        const divStiker = document.getElementById('sticker');
+        const divSticker = document.getElementById('sticker');
 
         try {
-            const response = await fetch(`./api/sticker/all/`);
+            const response = await fetch('/api/sticker/all/');
             const data = await response.json();
 
             if (data.status === 'success') {
@@ -86,17 +106,15 @@ if (typeof video === 'undefined') {
                     img.addEventListener('click', () => {
                         toggleImage(sticker.imagePath, sticker.id);
                     });
-                    divStiker.appendChild(img);
+                    divSticker.appendChild(img);
                 });
-            } else {
-                console.error('Error:', data);
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error loading stickers:', error);
         }
     }
 
-    // Draw the video stream and the overlaid images on the canvas
+    // Draw the webcam stream and overlaid stickers on the canvas
     video.addEventListener('play', () => {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -111,41 +129,8 @@ if (typeof video === 'undefined') {
         };
         draw();
     });
-    // Listen for the upload button click
+
     uploadButton.addEventListener('click', uploadImage);
 
-    // Load the stickers when the page loads
-    window.onload = stickerInjector();
-
-
-    let data1;
-    // Fonction pour récupérer et stocker les données
-    async function fetchData1() {
-        try {
-            data1 = await fetchWithAuth('./api/account/check/');
-            console.log(data1); // Utilisez la variable `data` comme vous le souhaitez
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    // Appel initial de la fonction pour récupérer les données
-    fetchData1();
-    console.log(data1);
-
-    let data2;
-    // Fonction pour récupérer et stocker les données
-    async function fetchData2() {
-        try {
-            data1 = await fetch('./api/image/getall/');
-            console.log(data2); // Utilisez la variable `data` comme vous le souhaitez
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    // Appel initial de la fonction pour récupérer les données
-    fetchData2();
-    console.log(data2);
-
+    stickerInjector();
 }

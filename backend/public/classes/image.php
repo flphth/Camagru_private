@@ -50,15 +50,27 @@ class Image
             return ["status" => "error", "message" => "Invalid image data."];
         }
 
-        // Merge with the selected stickers
+        // Merge with the selected stickers (scaled to the capture, alpha preserved)
         if (!empty($stickersId)) {
+            $baseW = imagesx($webcamImage);
+            $baseH = imagesy($webcamImage);
+
+            // Blend semi-transparent sticker pixels onto the capture
+            imagealphablending($webcamImage, true);
+
             $stickerPaths = $this->getStickerPaths($stickersId);
             foreach ($stickerPaths as $stickerPath) {
                 $stickerImage = @imagecreatefrompng($stickerPath);
                 if ($stickerImage === false) {
                     continue;
                 }
-                imagecopy($webcamImage, $stickerImage, 0, 0, 0, 0, imagesx($stickerImage), imagesy($stickerImage));
+                // Stretch each sticker over the whole frame, like the live preview does
+                imagecopyresampled(
+                    $webcamImage, $stickerImage,
+                    0, 0, 0, 0,
+                    $baseW, $baseH,
+                    imagesx($stickerImage), imagesy($stickerImage)
+                );
                 imagedestroy($stickerImage);
             }
         }
