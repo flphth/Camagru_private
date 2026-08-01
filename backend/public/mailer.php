@@ -14,6 +14,7 @@ class Mailer
             'Content-Type: text/html; charset=UTF-8'
         ]);
 
-        return mail($to, $subject, $htmlBody, $headers);
+        // Suppress transport warnings so a failed relay never corrupts the JSON response
+        return @mail($to, $subject, $htmlBody, $headers);
     }
 }
