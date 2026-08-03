@@ -1,5 +1,19 @@
-<video id="videoElement" autoplay></video>
-<canvas id="canvasElement"></canvas>
-<div id="sticker"></div>
-<button class="imageButton" id="deselectImage">Désélectionner</button>
-<button class="imageButton" id="uploadImage">Uploader l'image</button>
+<div class="editor">
+    <section class="editor-main">
+        <video id="videoElement" autoplay></video>
+        <canvas id="canvasElement"></canvas>
+        <div id="sticker"></div>
+        <div class="editor-actions">
+            <button class="imageButton" id="deselectImage">Deselect</button>
+            <button class="imageButton" id="uploadImage">Capture</button>
+        </div>
+        <div class="editor-upload">
+            <label class="form-label" for="fileInput">No webcam? Upload an image instead</label>
+            <input class="form-input" type="file" id="fileInput" accept="image/png, image/jpeg">
+        </div>
+    </section>
+    <aside class="editor-side">
+        <h5>Your pictures</h5>
+        <div id="thumbnails"></div>
+    </aside>
+</div>

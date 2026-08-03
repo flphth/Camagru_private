@@ -123,7 +123,7 @@ class Image
 
         // Newest first; $perPage and $offset are validated integers
         $stmt = $pdo->prepare(
-            'SELECT Image.id, Image.imagePath, Image.createdAt, User.username
+            'SELECT Image.id, Image.userId, Image.imagePath, Image.createdAt, User.username
              FROM Image JOIN User ON Image.userId = User.id
              ORDER BY Image.createdAt DESC, Image.id DESC
              LIMIT ' . $perPage . ' OFFSET ' . $offset
@@ -138,6 +138,68 @@ class Image
             "totalPages" => (int)ceil($total / $perPage),
             "total" => $total
         ];
+    }
+
+    // Get the images owned by the connected user (for the editing page side panel)
+    public function mine($token)
+    {
+        $account = new Account();
+        $userId = $account->getUser($token);
+
+        if ($userId < 1) {
+            return ["status" => "error", "message" => "You must be logged in."];
+        }
+
+        $pdo = Database::getPDO();
+        $stmt = $pdo->prepare(
+            'SELECT id, imagePath, createdAt FROM Image
+             WHERE userId = :userId
+             ORDER BY createdAt DESC, id DESC'
+        );
+        $stmt->execute(['userId' => $userId]);
+        $images = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return ["status" => "success", "images" => $images];
+    }
+
+    // Delete one of the user's own images (never someone else's)
+    public function delete($token)
+    {
+        $account = new Account();
+        $userId = $account->getUser($token);
+
+        if ($userId < 1) {
+            return ["status" => "error", "message" => "You must be logged in."];
+        }
+
+        $json = file_get_contents('php://input');
+        $data = json_decode($json);
+
+        if (!isset($data->imageId)) {
+            return ["status" => "error", "message" => "Invalid image."];
+        }
+
+        $pdo = Database::getPDO();
+
+        // Ownership is enforced in the query: nothing is returned for another user's image
+        $stmt = $pdo->prepare('SELECT imagePath FROM Image WHERE id = :id AND userId = :userId');
+        $stmt->execute(['id' => $data->imageId, 'userId' => $userId]);
+        $image = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$image) {
+            return ["status" => "error", "message" => "Image not found."];
+        }
+
+        $stmt = $pdo->prepare('DELETE FROM Image WHERE id = :id AND userId = :userId');
+        $stmt->execute(['id' => $data->imageId, 'userId' => $userId]);
+
+        // Remove the file from disk too (imagePath is stored as ./static/xxx.png)
+        $filePath = getcwd() . '/' . ltrim($image['imagePath'], './');
+        if (is_file($filePath)) {
+            @unlink($filePath);
+        }
+
+        return ["status" => "success", "message" => "Image deleted."];
     }
 
     // Get sticker paths from database

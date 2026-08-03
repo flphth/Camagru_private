@@ -5,6 +5,8 @@ if (typeof video === 'undefined') {
     const context = canvas.getContext('2d');
     const deselectButton = document.getElementById('deselectImage');
     const uploadButton = document.getElementById('uploadImage');
+    const fileInput = document.getElementById('fileInput');
+    const thumbnails = document.getElementById('thumbnails');
     let overlayStickers = [];
 
     // Capture stays disabled until a superposable image is selected
@@ -51,6 +53,24 @@ if (typeof video === 'undefined') {
         img.src = source;
     }
 
+    // Send a base64 PNG to the server, which merges the selected stickers
+    async function sendImage(imageData) {
+        const selectedStickersIds = overlayStickers.map(img => img.id);
+
+        const data = await fetchWithAuth('/api/image/upload/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageData, stickersId: selectedStickersIds })
+        });
+
+        if (data && data.status === 'success') {
+            alert('Image uploaded successfully!');
+            loadThumbnails();
+        } else {
+            alert((data && data.message) ? data.message : 'Image upload error. Please try again.');
+        }
+    }
+
     // Capture the current frame and send it to the server for merging
     async function uploadImage() {
         if (overlayStickers.length === 0) {
@@ -71,23 +91,44 @@ if (typeof video === 'undefined') {
             tempCanvas.height = height;
             tempCanvas.getContext('2d').drawImage(video, 0, 0, width, height);
 
-            const imageData = tempCanvas.toDataURL('image/png');
-            const selectedStickersIds = overlayStickers.map(img => img.id);
-
-            const data = await fetchWithAuth('/api/image/upload/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: imageData, stickersId: selectedStickersIds })
-            });
-
-            if (data && data.status === 'success') {
-                alert('Image uploaded successfully!');
-            } else {
-                alert((data && data.message) ? data.message : 'Image upload error. Please try again.');
-            }
+            await sendImage(tempCanvas.toDataURL('image/png'));
         } catch (error) {
             alert('Image upload error. Please try again.');
         }
+    }
+
+    // Upload an image file instead of the webcam (scaled down, converted to PNG)
+    function uploadFile() {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = async () => {
+                const maxWidth = 640;
+                let width = img.naturalWidth;
+                let height = img.naturalHeight;
+                if (width > maxWidth) {
+                    height = Math.round(height * maxWidth / width);
+                    width = maxWidth;
+                }
+
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                tempCanvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+                try {
+                    await sendImage(tempCanvas.toDataURL('image/png'));
+                } catch (error) {
+                    alert('Image upload error. Please try again.');
+                }
+                fileInput.value = '';
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
     }
 
     // Load the superposable stickers
@@ -114,6 +155,45 @@ if (typeof video === 'undefined') {
         }
     }
 
+    // Load the user's own images into the side panel
+    async function loadThumbnails() {
+        const data = await fetchWithAuth('/api/image/mine/');
+        if (!data || data.status !== 'success') return;
+
+        thumbnails.innerHTML = '';
+        data.images.forEach(image => {
+            const wrap = document.createElement('div');
+            wrap.className = 'thumbnail';
+
+            const img = document.createElement('img');
+            img.src = image.imagePath;
+            img.className = 'img-responsive';
+
+            const remove = document.createElement('button');
+            remove.className = 'btn btn-error btn-sm';
+            remove.textContent = 'Delete';
+            remove.addEventListener('click', () => deleteImage(image.id));
+
+            wrap.appendChild(img);
+            wrap.appendChild(remove);
+            thumbnails.appendChild(wrap);
+        });
+    }
+
+    // Delete one of the user's own images
+    async function deleteImage(imageId) {
+        const data = await fetchWithAuth('/api/image/delete/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageId })
+        });
+        if (data && data.status === 'success') {
+            loadThumbnails();
+        } else if (data && data.message) {
+            alert(data.message);
+        }
+    }
+
     // Draw the webcam stream and overlaid stickers on the canvas
     video.addEventListener('play', () => {
         canvas.width = video.videoWidth;
@@ -131,6 +211,8 @@ if (typeof video === 'undefined') {
     });
 
     uploadButton.addEventListener('click', uploadImage);
+    fileInput.addEventListener('change', uploadFile);
 
     stickerInjector();
+    loadThumbnails();
 }

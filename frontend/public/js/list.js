@@ -2,11 +2,13 @@ if (typeof list === 'undefined') {
 
     const list = document.getElementById('list-element');
     let isConnected = false;
+    let currentUserId = 0;
     let currentPage = 1;
 
     (async () => {
         const auth = await fetchWithAuth('/api/account/check/');
         isConnected = !!(auth && auth.status === 'connected');
+        currentUserId = (auth && auth.userId) ? Number(auth.userId) : 0;
 
         const params = new URLSearchParams(window.location.search);
         currentPage = Math.max(1, parseInt(params.get('page') || '1', 10));
@@ -56,6 +58,15 @@ if (typeof list === 'undefined') {
         subtitle.textContent = image.createdAt;
         header.appendChild(title);
         header.appendChild(subtitle);
+
+        // Owners can delete their own images straight from the gallery
+        if (isConnected && Number(image.userId) === currentUserId) {
+            const remove = document.createElement('button');
+            remove.className = 'btn btn-error btn-sm mt-2';
+            remove.textContent = 'Delete';
+            remove.addEventListener('click', () => deleteImage(image.id));
+            header.appendChild(remove);
+        }
 
         const body = document.createElement('div');
         body.className = 'card-body';
@@ -213,6 +224,19 @@ if (typeof list === 'undefined') {
         });
         if (data && data.status === 'success') {
             fetchLikes(imageId);
+        } else if (data && data.message) {
+            alert(data.message);
+        }
+    }
+
+    async function deleteImage(imageId) {
+        const data = await fetchWithAuth('/api/image/delete/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageId })
+        });
+        if (data && data.status === 'success') {
+            fetchImages(currentPage);
         } else if (data && data.message) {
             alert(data.message);
         }

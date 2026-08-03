@@ -43,13 +43,51 @@ body {
     margin: auto
 }
 
+/* Editing page */
+.editor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 10px;
+}
+
+.editor-main {
+    flex: 2 1 640px;
+    max-width: 100%;
+    text-align: center;
+}
+
+.editor-side {
+    flex: 1 1 200px;
+    max-width: 260px;
+}
+
+.editor-upload {
+    margin: 10px 0;
+}
+
+#thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.thumbnail img {
+    width: 100%;
+    display: block;
+    margin-bottom: 4px;
+}
+
 /* Webcam */
 #videoElement {
     display: none;
 }
 
 #canvasElement {
-    width: 640px;
+    width: 100%;
+    max-width: 640px;
     aspect-ratio: 640 / 480;
     border: 1px solid black;
 }
