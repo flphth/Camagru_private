@@ -133,9 +133,6 @@ class Account
             . '<p>Please activate your account by clicking the link below:</p>'
             . '<p><a href="' . $link . '">' . $link . '</a></p>';
 
-        // Keep the link retrievable during development even without a configured SMTP relay
-        error_log('Camagru activation link for ' . $email . ': ' . $link);
-
         Mailer::send($email, $subject, $body);
     }
 
@@ -289,9 +286,6 @@ class Account
         $body = '<p>You requested a password reset.</p>'
             . '<p>Choose a new password using the link below (valid for 1 hour):</p>'
             . '<p><a href="' . $link . '">' . $link . '</a></p>';
-
-        // Keep the link retrievable during development even without a configured SMTP relay
-        error_log('Camagru reset link for ' . $email . ': ' . $link);
 
         Mailer::send($email, $subject, $body);
     }

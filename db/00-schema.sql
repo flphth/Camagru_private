@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS `Like` (
     imageId INT NOT NULL,
     userId INT NOT NULL,
     FOREIGN KEY (imageId) REFERENCES Image(id) ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE
+    FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE,
+    UNIQUE (imageId, userId)  -- a user can like an image only once
 );
 
 -- Comment
@@ -44,14 +45,4 @@ CREATE TABLE IF NOT EXISTS Comment (
 CREATE TABLE IF NOT EXISTS Sticker (
     id INT AUTO_INCREMENT PRIMARY KEY,
     imagePath VARCHAR(255) NOT NULL
-);
-
--- Like
-CREATE TABLE IF NOT EXISTS `Like` (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    imageId INT NOT NULL,
-    userId INT NOT NULL,
-    FOREIGN KEY (imageId) REFERENCES Image(id) ON DELETE CASCADE,
-    FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE,
-    UNIQUE (imageId, userId)  -- Ensure a user can like an image only once
 );

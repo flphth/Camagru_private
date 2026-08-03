@@ -65,9 +65,6 @@ class Comment
         $body = '<p>Someone just commented on one of your images.</p>'
             . '<p><a href="' . $appUrl . '/list">See it on Camagru</a></p>';
 
-        // Observable in dev even without a configured SMTP relay
-        error_log('Camagru comment notification for ' . $author['email']);
-
         Mailer::send($author['email'], $subject, $body);
     }
 

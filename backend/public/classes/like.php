@@ -18,6 +18,10 @@ class Like
         $json = file_get_contents('php://input');
         $data = json_decode($json);
 
+        if (!isset($data->imageId)) {
+            return ["status" => "error", "message" => "Invalid image."];
+        }
+
         // Check if the user has already liked the image
         $pdo = Database::getPDO();
         $stmt = $pdo->prepare('SELECT * FROM `Like` WHERE imageId = :imageId AND userId = :userId');
@@ -52,6 +56,10 @@ class Like
         // Get JSON data
         $json = file_get_contents('php://input');
         $data = json_decode($json);
+
+        if (!isset($data->imageId)) {
+            return ["status" => "error", "message" => "Invalid image."];
+        }
 
         // Remove like from the database
         $pdo = Database::getPDO();
