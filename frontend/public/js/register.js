@@ -22,7 +22,7 @@ if (typeof registerForm === 'undefined') {
 
         if (data.status === 'success') {
             // Replace the form with a confirmation screen
-            const panel = registerForm.closest('.auth-panel');
+            const panel = registerForm.closest('.auth-form');
             panel.innerHTML = '';
 
             const title = document.createElement('h2');

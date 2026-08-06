@@ -47,8 +47,8 @@ function renderNav() {
         nav.innerHTML =
             '<a href="/list" onclick="navigate(event, \'list\')" class="sidebar-link">' + NAV_ICONS.gallery + '<span>Gallery</span></a>' +
             '<a href="/home" onclick="navigate(event, \'home\')" class="sidebar-link">' + NAV_ICONS.editing + '<span>Create</span></a>' +
-            '<a href="/profile" onclick="navigate(event, \'profile\')" class="sidebar-link">' + NAV_ICONS.profile + '<span>Profile</span></a>' +
-            '<a href="/logout" onclick="logout(event)" class="sidebar-link sidebar-logout">' + NAV_ICONS.logout + '<span>Logout</span></a>';
+            '<a href="/profile" onclick="navigate(event, \'profile\')" class="sidebar-link sidebar-bottom">' + NAV_ICONS.profile + '<span>Profile</span></a>' +
+            '<a href="/logout" onclick="logout(event)" class="sidebar-link">' + NAV_ICONS.logout + '<span>Logout</span></a>';
     } else {
         nav.innerHTML =
             '<a href="/list" onclick="navigate(event, \'list\')" class="sidebar-link">' + NAV_ICONS.gallery + '<span>Gallery</span></a>' +
@@ -75,7 +75,7 @@ function logout(event) {
     event.preventDefault();
     localStorage.removeItem('authToken');
     renderNav();
-    navigate(event, 'list');
+    navigate(event, 'login');
 }
 
 // One page navigation block
