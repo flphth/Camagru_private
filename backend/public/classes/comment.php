@@ -37,7 +37,12 @@ class Comment
             $commentId = $pdo->lastInsertId();
 
             if ($commentId > 0) {
-                $this->notifyAuthor($pdo, $data->imageId, $userId);
+                // Notifying the author is best-effort: it must never fail the comment
+                try {
+                    $this->notifyAuthor($pdo, $data->imageId, $userId);
+                } catch (Throwable $e) {
+                    error_log('Comment notification failed: ' . $e->getMessage());
+                }
                 return ["status" => "success", "contentId" => $commentId];
             } else {
                 return ["status" => "error", "message" => "Failed to send content."];

@@ -1,23 +1,21 @@
-<div class="align-items-center login">
-    <form id="login">
-        <div class="empty">
+<div class="auth-split">
+    <div class="auth-hero">
+        <h1>Share your moments with Camagru.</h1>
+        <p>Capture a picture, decorate it with fun overlays and post it to the gallery.</p>
+    </div>
+    <div class="auth-panel">
+        <h2 class="auth-title">Log into Camagru</h2>
+        <form id="login">
             <div class="form-group">
-                <div class="col-ml-auto">
-                    <label class="form-label" for="username">Username</label>
-                    <input class="form-input" type="text" id="username" placeholder="Username">
-                </div>
+                <input class="form-input" type="text" id="username" placeholder="Username">
             </div>
             <div class="form-group">
-                <div class="col-ml-auto">
-                    <label class="form-label" for="password">Password</label>
-                    <input class="form-input" type="password" id="password" placeholder="Password">
-                </div>
+                <input class="form-input" type="password" id="password" placeholder="Password">
             </div>
-            <div class="empty-action">
-                <button class="btn btn-primary" type="submit">Login</button>
-                <div id="message" class="message"></div>
-            </div>
-        </div>
-    </form>
-    <a href="/forgot" onclick="navigate(event, 'forgot')" class="btn btn-link">Forgot password?</a>
+            <button class="btn btn-primary btn-block" type="submit">Log in</button>
+            <div id="message" class="message mt-2"></div>
+        </form>
+        <a href="/forgot" onclick="navigate(event, 'forgot')" class="auth-link">Forgot password?</a>
+        <a href="/register" onclick="navigate(event, 'register')" class="btn btn-block register-cta">Create new account</a>
+    </div>
 </div>

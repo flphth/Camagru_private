@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>Camagru</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/spectre.min.css">
     <link rel="stylesheet" href="/css/spectre-exp.min.css">
     <link rel="stylesheet" href="/css/spectre-icons.min.css">
@@ -13,18 +16,27 @@
 </head>
 
 <body>
-    <header class="navbar">
-        <section class="navbar-section d-flex justify-content-center flex-grow-1">
-            <a href="/" onclick="navigate(event, 'home')" class="navbar-brand">Camagru</a>
-        </section>
-        <section class="navbar-section" id="nav-links">
-        </section>
-    </header>
-    <main id="content">
-    </main>
-    <footer class="footer">
-        <span>© 2026 Camagru — 42 project</span>
-    </footer>
+    <aside class="sidebar">
+        <a href="/list" onclick="navigate(event, 'list')" class="sidebar-brand" id="sidebar-brand">Camagru</a>
+        <nav id="nav-links"></nav>
+    </aside>
+    <div class="app-main">
+        <main id="content"></main>
+        <footer class="footer">
+            <span>Camagru</span>
+        </footer>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <p id="modal-text" class="modal-text"></p>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="btn">Cancel</button>
+                <button id="modal-confirm" class="btn btn-error">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/router.js"></script>
 </body>
 

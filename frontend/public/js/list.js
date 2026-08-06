@@ -4,6 +4,7 @@ if (typeof list === 'undefined') {
     let isConnected = false;
     let currentUserId = 0;
     let currentPage = 1;
+    let pendingHighlight = null;
 
     (async () => {
         const auth = await fetchWithAuth('/api/account/check/');
@@ -12,6 +13,7 @@ if (typeof list === 'undefined') {
 
         const params = new URLSearchParams(window.location.search);
         currentPage = Math.max(1, parseInt(params.get('page') || '1', 10));
+        pendingHighlight = params.get('highlight');
         fetchImages(currentPage);
     })();
 
@@ -26,117 +28,139 @@ if (typeof list === 'undefined') {
             }
 
             list.innerHTML = '';
+
+            if (!data.images || data.images.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-gallery';
+                empty.textContent = 'The gallery is empty for now.';
+                list.appendChild(empty);
+                renderPagination(data.page, data.totalPages);
+                return;
+            }
+
             data.images.forEach(image => {
-                list.appendChild(buildCard(image));
+                list.appendChild(buildPost(image));
                 fetchComments(image.id);
                 fetchLikes(image.id);
             });
             renderPagination(data.page, data.totalPages);
+
+            if (pendingHighlight) {
+                highlightPost(pendingHighlight);
+                pendingHighlight = null;
+            }
         } catch (error) {
             console.error('Error fetching images:', error);
         }
     }
 
-    function buildCard(image) {
-        const card = document.createElement('div');
-        card.className = 'card';
+    function buildPost(image) {
+        const post = document.createElement('div');
+        post.className = 'post';
+        post.dataset.imageId = image.id;
 
-        const imgWrap = document.createElement('div');
-        imgWrap.className = 'card-image';
-        const img = document.createElement('img');
-        img.src = image.imagePath;
-        img.className = 'img-responsive';
-        imgWrap.appendChild(img);
+        // Header: avatar monogram + username + date
+        const head = document.createElement('div');
+        head.className = 'post-head';
 
-        const header = document.createElement('div');
-        header.className = 'card-header';
-        const title = document.createElement('div');
-        title.className = 'card-title h6';
-        title.textContent = image.username;
-        const subtitle = document.createElement('div');
-        subtitle.className = 'card-subtitle text-gray';
-        subtitle.textContent = image.createdAt;
-        header.appendChild(title);
-        header.appendChild(subtitle);
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.textContent = (image.username || '?').charAt(0).toUpperCase();
+
+        const meta = document.createElement('div');
+        meta.className = 'post-meta';
+        const name = document.createElement('span');
+        name.className = 'post-user';
+        name.textContent = image.username;
+        const date = document.createElement('span');
+        date.className = 'post-date';
+        date.textContent = image.createdAt;
+        meta.appendChild(name);
+        meta.appendChild(date);
+
+        head.appendChild(avatar);
+        head.appendChild(meta);
 
         // Owners can delete their own images straight from the gallery
         if (isConnected && Number(image.userId) === currentUserId) {
             const remove = document.createElement('button');
-            remove.className = 'btn btn-error btn-sm mt-2';
+            remove.className = 'btn btn-error btn-sm post-delete';
             remove.textContent = 'Delete';
             remove.addEventListener('click', () => deleteImage(image.id));
-            header.appendChild(remove);
+            head.appendChild(remove);
         }
 
-        const body = document.createElement('div');
-        body.className = 'card-body';
-        body.appendChild(buildCommentsPanel(image.id));
-        body.appendChild(buildLikesPanel(image.id));
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'post-image';
+        const img = document.createElement('img');
+        img.src = image.imagePath;
+        imgWrap.appendChild(img);
 
-        card.appendChild(imgWrap);
-        card.appendChild(header);
-        card.appendChild(body);
-        return card;
+        post.appendChild(head);
+        post.appendChild(imgWrap);
+        post.appendChild(buildActions(image.id));
+        post.appendChild(buildComments(image.id));
+        return post;
     }
 
-    function buildCommentsPanel(imageId) {
-        const panel = document.createElement('div');
-        panel.className = 'panel';
-        panel.innerHTML = '<div class="panel-header"><div class="panel-title h6">Comments</div></div>';
-
-        const commentsBody = document.createElement('div');
-        commentsBody.className = 'panel-body';
-        commentsBody.id = 'comments-' + imageId;
-        panel.appendChild(commentsBody);
+    function buildActions(imageId) {
+        const actions = document.createElement('div');
+        actions.className = 'post-actions';
 
         if (isConnected) {
-            const footer = document.createElement('div');
-            footer.className = 'panel-footer';
-            const group = document.createElement('div');
-            group.className = 'input-group';
-            const input = document.createElement('input');
-            input.className = 'form-input';
-            input.type = 'text';
-            input.placeholder = 'Add a comment';
-            const send = document.createElement('button');
-            send.className = 'btn btn-primary input-group-btn';
-            send.textContent = 'Send';
-            send.addEventListener('click', () => addComment(imageId, input));
-            group.appendChild(input);
-            group.appendChild(send);
-            footer.appendChild(group);
-            panel.appendChild(footer);
+            const like = document.createElement('button');
+            like.className = 'btn btn-success btn-sm';
+            like.textContent = 'Like';
+            like.addEventListener('click', () => likeImage(imageId));
+            const unlike = document.createElement('button');
+            unlike.className = 'btn btn-sm';
+            unlike.textContent = 'Unlike';
+            unlike.addEventListener('click', () => unlikeImage(imageId));
+            actions.appendChild(like);
+            actions.appendChild(unlike);
         }
-        return panel;
-    }
 
-    function buildLikesPanel(imageId) {
-        const panel = document.createElement('div');
-        panel.className = 'panel mt-2';
-        panel.innerHTML = '<div class="panel-header"><div class="panel-title h6">Likes</div></div>';
-
-        const likesBody = document.createElement('div');
-        likesBody.className = 'panel-body';
+        const countWrap = document.createElement('span');
+        countWrap.className = 'like-count-wrap';
         const count = document.createElement('span');
         count.className = 'like-count';
         count.id = 'like-count-' + imageId;
         count.textContent = '0';
-        likesBody.appendChild(count);
+        const label = document.createElement('span');
+        label.className = 'like-label';
+        label.textContent = ' likes';
+        countWrap.appendChild(count);
+        countWrap.appendChild(label);
+        actions.appendChild(countWrap);
+
+        return actions;
+    }
+
+    function buildComments(imageId) {
+        const wrap = document.createElement('div');
+        wrap.className = 'post-comments';
+
+        const commentsBody = document.createElement('div');
+        commentsBody.className = 'comments';
+        commentsBody.id = 'comments-' + imageId;
+        wrap.appendChild(commentsBody);
 
         if (isConnected) {
-            const like = document.createElement('button');
-            like.className = 'btn btn-success btn-sm ml-2';
-            like.textContent = 'Like';
-            like.addEventListener('click', () => likeImage(imageId));
-            const unlike = document.createElement('button');
-            unlike.className = 'btn btn-error btn-sm ml-2';
-            unlike.textContent = 'Unlike';
-            unlike.addEventListener('click', () => unlikeImage(imageId));
-            likesBody.appendChild(like);
-            likesBody.appendChild(unlike);
+            const group = document.createElement('div');
+            group.className = 'comment-form';
+            const input = document.createElement('input');
+            input.className = 'form-input';
+            input.type = 'text';
+            input.placeholder = 'Add a comment…';
+            const send = document.createElement('button');
+            send.className = 'btn btn-primary btn-sm';
+            send.textContent = 'Post';
+            send.addEventListener('click', () => addComment(imageId, input));
+            group.appendChild(input);
+            group.appendChild(send);
+            wrap.appendChild(group);
         }
-        panel.appendChild(likesBody);
-        return panel;
+        return wrap;
     }
 
     function appendComment(imageId, content, date) {
@@ -144,11 +168,11 @@ if (typeof list === 'undefined') {
         if (!container) return;
         const el = document.createElement('div');
         el.className = 'comment';
-        const c = document.createElement('div');
+        const c = document.createElement('span');
         c.className = 'comment-content';
         c.textContent = content;
-        const d = document.createElement('div');
-        d.className = 'comment-date text-gray';
+        const d = document.createElement('span');
+        d.className = 'comment-date';
         d.textContent = date;
         el.appendChild(c);
         el.appendChild(d);
@@ -230,6 +254,8 @@ if (typeof list === 'undefined') {
     }
 
     async function deleteImage(imageId) {
+        if (!(await confirmAction('Delete this image?'))) return;
+
         const data = await fetchWithAuth('/api/image/delete/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -240,6 +266,14 @@ if (typeof list === 'undefined') {
         } else if (data && data.message) {
             alert(data.message);
         }
+    }
+
+    function highlightPost(imageId) {
+        const el = list.querySelector('.post[data-image-id="' + imageId + '"]');
+        if (!el) return;
+        el.classList.add('is-highlight');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => el.classList.remove('is-highlight'), 2500);
     }
 
     function renderPagination(page, totalPages) {

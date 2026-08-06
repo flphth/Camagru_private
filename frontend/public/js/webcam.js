@@ -64,8 +64,9 @@ if (typeof video === 'undefined') {
         });
 
         if (data && data.status === 'success') {
-            alert('Image uploaded successfully!');
-            loadThumbnails();
+            // Jump to the gallery and highlight the freshly created post
+            history.pushState(null, '', '/list?highlight=' + data.imageId);
+            loadContent('list');
         } else {
             alert((data && data.message) ? data.message : 'Image upload error. Please try again.');
         }
@@ -182,6 +183,8 @@ if (typeof video === 'undefined') {
 
     // Delete one of the user's own images
     async function deleteImage(imageId) {
+        if (!(await confirmAction('Delete this image?'))) return;
+
         const data = await fetchWithAuth('/api/image/delete/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
