@@ -53,6 +53,15 @@ services:
     networks:
       - camagru_network
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    restart: always
+    ports:
+      - "8025:8025"  # web inbox, SMTP stays internal on 1025
+    networks:
+      - camagru_network
+
 volumes:
   backend:
   static:
