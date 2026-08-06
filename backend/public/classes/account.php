@@ -67,10 +67,14 @@ class Account
         $json = file_get_contents('php://input');
         $data = json_decode($json);
     
-        // Check if the email and password match a user in the database
+        if (!isset($data->username) || !isset($data->password)) {
+            return ["status" => "error", "message" => "Invalid username or password."];
+        }
+
+        // Check if the username and password match a user in the database
         $pdo = Database::getPDO();
-        $stmt = $pdo->prepare('SELECT id, passwordHash, isActiveted FROM User WHERE email = :email');
-        $stmt->execute(['email' => $data->email]);
+        $stmt = $pdo->prepare('SELECT id, passwordHash, isActiveted FROM User WHERE username = :username');
+        $stmt->execute(['username' => $data->username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if ($user && password_verify($data->password, $user['passwordHash'])) {
@@ -92,7 +96,7 @@ class Account
                 return ["status" => "error", "message" => "Account is not activated. Please check your email to activate your account."];
             }
         } else {
-            return ["status" => "error", "message" => "Invalid email or password."];
+            return ["status" => "error", "message" => "Invalid username or password."];
         }
     }
 
