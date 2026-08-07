@@ -1,4 +1,14 @@
 <div class="profile">
+    <h2 class="auth-title">Edit profile</h2>
+
+    <div class="profile-head">
+        <div class="avatar profile-avatar" id="profile-avatar">?</div>
+        <div class="profile-head-info">
+            <div class="profile-head-name" id="profile-username">username</div>
+            <div class="profile-head-sub">Manage your account details</div>
+        </div>
+    </div>
+
     <form id="profile">
         <div class="form-group">
             <label class="form-label" for="username">Username</label>
@@ -9,18 +19,27 @@
             <input class="form-input" type="email" id="email" placeholder="Email">
         </div>
         <div class="form-group">
-            <label class="form-label" for="password">New password (leave empty to keep current)</label>
-            <input class="form-input" type="password" id="password" placeholder="New password">
-        </div>
-        <div class="form-group">
             <label class="form-switch">
                 <input type="checkbox" id="notifyOnComment">
                 <i class="form-icon"></i> Email me when someone comments on my images
             </label>
         </div>
-        <div class="empty-action">
-            <button class="btn btn-primary" type="submit">Save changes</button>
-            <div id="message" class="message mt-2"></div>
+
+        <h3 class="profile-section-title">Change password</h3>
+        <div class="form-group">
+            <label class="form-label" for="currentPassword">Current password</label>
+            <input class="form-input" type="password" id="currentPassword" placeholder="Current password">
         </div>
+        <div class="form-group">
+            <label class="form-label" for="newPassword">New password</label>
+            <input class="form-input" type="password" id="newPassword" placeholder="New password">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="newPasswordConfirm">Confirm new password</label>
+            <input class="form-input" type="password" id="newPasswordConfirm" placeholder="Confirm new password">
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit">Save changes</button>
+        <div id="message" class="message mt-2"></div>
     </form>
 </div>

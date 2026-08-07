@@ -1,5 +1,6 @@
 <div class="auth-form">
-    <h2 class="auth-title">Get started on Camagru</h2>
+    <img src="/img/camagru-co.png" alt="Camagru" class="auth-logo">
+    <h2 class="auth-title">Get started</h2>
     <p class="auth-subtitle">Sign up to share and discover pictures.</p>
     <form id="register">
         <div class="form-group">
@@ -13,6 +14,11 @@
         <div class="form-group">
             <label class="form-label" for="password">Password</label>
             <input class="form-input" type="password" id="password" name="password" placeholder="Password">
+            <div id="password-strength" class="password-strength"></div>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="passwordConfirm">Confirm password</label>
+            <input class="form-input" type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password">
         </div>
         <button class="btn btn-primary btn-block" type="submit">Sign up</button>
         <div id="message" class="message mt-2"></div>

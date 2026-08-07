@@ -6,6 +6,9 @@ if (typeof list === 'undefined') {
     let currentPage = 1;
     let pendingHighlight = null;
 
+    const THUMB_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
+    const THUMB_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>';
+
     (async () => {
         const auth = await fetchWithAuth('/api/account/check/');
         isConnected = !!(auth && auth.status === 'connected');
@@ -110,11 +113,11 @@ if (typeof list === 'undefined') {
         if (isConnected) {
             const like = document.createElement('button');
             like.className = 'btn btn-success btn-sm';
-            like.textContent = 'Like';
+            like.innerHTML = THUMB_UP + '<span>Like</span>';
             like.addEventListener('click', () => likeImage(imageId));
             const unlike = document.createElement('button');
             unlike.className = 'btn btn-sm';
-            unlike.textContent = 'Unlike';
+            unlike.innerHTML = THUMB_DOWN + '<span>Unlike</span>';
             unlike.addEventListener('click', () => unlikeImage(imageId));
             actions.appendChild(like);
             actions.appendChild(unlike);

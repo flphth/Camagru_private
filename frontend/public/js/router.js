@@ -125,8 +125,22 @@ function confirmAction(message) {
 }
 
 function loadContent(page) {
-    const authPages = ['login', 'register', 'forgot', 'reset', 'activate'];
-    document.body.classList.toggle('no-sidebar', authPages.includes(page));
+    const noSidebarPages = ['login', 'register', 'forgot', 'reset', 'activate', 'about'];
+    document.body.classList.toggle('no-sidebar', noSidebarPages.includes(page));
+
+    // Back button: on secondary screens only (never on login); returns to login,
+    // or to the gallery from the About page
+    const backBtn = document.getElementById('auth-back');
+    if (backBtn) {
+        const showBack = ['register', 'forgot', 'reset', 'activate', 'about'].includes(page);
+        backBtn.classList.toggle('is-visible', showBack);
+        if (showBack) {
+            const target = (page === 'about') ? 'list' : 'login';
+            backBtn.setAttribute('href', '/' + target);
+            backBtn.setAttribute('onclick', "navigate(event, '" + target + "')");
+        }
+    }
+
     fetch(`${page}.html`)
         .then(response => response.text())
         .then(data => {

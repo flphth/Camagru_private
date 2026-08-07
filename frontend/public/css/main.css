@@ -55,13 +55,15 @@ body {
 }
 
 .sidebar-brand {
-    font-family: 'Caveat', cursive;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text);
-    text-decoration: none;
+    display: block;
     padding: 4px 12px;
     margin-bottom: 14px;
+    text-decoration: none;
+}
+
+.sidebar-brand img {
+    height: 42px;
+    display: block;
 }
 
 .sidebar-brand:hover {
@@ -129,6 +131,7 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     height: auto;
     line-height: 1.4;
     border-radius: var(--radius);
@@ -138,6 +141,11 @@ body {
     font-weight: 500;
     text-align: center;
     transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.btn svg {
+    width: 15px;
+    height: 15px;
 }
 
 .btn:hover {
@@ -301,15 +309,43 @@ body {
     text-decoration: underline;
 }
 
-/* Profile card */
+/* Profile ("Edit profile") page */
 .profile {
-    max-width: 440px;
+    max-width: 560px;
     margin: 40px auto;
-    background: var(--surface);
-    border: 1px solid var(--border);
+}
+
+.profile-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface-2);
     border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 32px 28px;
+    padding: 16px 20px;
+    margin: 18px 0 26px;
+}
+
+.profile-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
+}
+
+.profile-head-name {
+    font-weight: 700;
+}
+
+.profile-head-sub {
+    font-size: .85rem;
+    color: var(--muted);
+}
+
+.profile-section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 28px 0 12px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
 }
 
 /* Feed (gallery posts) */
@@ -624,10 +660,13 @@ body.no-sidebar .sidebar {
     text-align: center;
 }
 
-/* Confirmation modal */
-.modal-overlay {
+/* Confirmation modal (custom class names to avoid Spectre's own .modal) */
+.confirm-overlay {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(15, 17, 21, .45);
     display: none;
     align-items: center;
@@ -635,11 +674,11 @@ body.no-sidebar .sidebar {
     z-index: 100;
 }
 
-.modal-overlay.is-open {
+.confirm-overlay.is-open {
     display: flex;
 }
 
-.modal {
+.confirm-box {
     background: var(--surface);
     border-radius: var(--radius);
     padding: 24px;
@@ -648,18 +687,18 @@ body.no-sidebar .sidebar {
     box-shadow: 0 12px 40px rgba(15, 17, 21, .25);
 }
 
-.modal-text {
+.confirm-text {
     margin: 0 0 20px;
     text-align: center;
 }
 
-.modal-actions {
+.confirm-actions {
     display: flex;
     gap: 10px;
     justify-content: center;
 }
 
-.modal-actions .btn {
+.confirm-actions .btn {
     min-width: 100px;
 }
 
@@ -678,10 +717,6 @@ body.no-sidebar .sidebar {
 /* Back button, shown only on auth screens (no sidebar) */
 .auth-back {
     display: none;
-}
-
-body.no-sidebar .auth-back {
-    display: inline-flex;
     align-items: center;
     justify-content: center;
     position: fixed;
@@ -694,7 +729,11 @@ body.no-sidebar .auth-back {
     z-index: 40;
 }
 
-body.no-sidebar .auth-back:hover {
+.auth-back.is-visible {
+    display: inline-flex;
+}
+
+.auth-back:hover {
     background: var(--surface-2);
     text-decoration: none;
 }
@@ -704,15 +743,68 @@ body.no-sidebar .auth-back:hover {
     height: 22px;
 }
 
-/* Footer link */
+/* Password strength hint (register) */
+.password-strength {
+    margin-top: 6px;
+    min-height: 1em;
+    font-size: .78rem;
+    font-weight: 600;
+}
+
+.password-strength.weak {
+    color: var(--danger);
+}
+
+.password-strength.medium {
+    color: #c77700;
+}
+
+.password-strength.strong {
+    color: var(--success);
+}
+
+/* Footer */
 .footer a {
     color: var(--muted);
     text-decoration: none;
-    margin-left: 12px;
 }
 
 .footer a:hover {
     color: var(--text);
+}
+
+.footer-sep {
+    margin: 0 8px;
+    color: var(--border);
+}
+
+/* Brand logos on auth screens */
+.hero-logo {
+    height: 80px;
+    display: block;
+    margin-bottom: 22px;
+}
+
+.auth-logo {
+    height: 65px;
+    display: block;
+    margin: 0 0 18px;
+}
+
+/* Styled file upload (replaces the raw file input) */
+.upload-input {
+    display: none;
+}
+
+.upload-btn {
+    cursor: pointer;
+    padding: 8px 18px;
+}
+
+.editor-upload-hint {
+    margin-top: 8px;
+    font-size: .8rem;
+    color: var(--muted);
 }
 
 /* About page */

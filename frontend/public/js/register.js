@@ -2,13 +2,42 @@ if (typeof registerForm === 'undefined') {
 
     const registerForm = document.getElementById('register');
     const messageElement = document.getElementById('message');
+    const passwordInput = document.getElementById('password');
+    const strengthEl = document.getElementById('password-strength');
+
+    // Rough client-side strength hint (the server still enforces the real rules)
+    function passwordStrength(pw) {
+        if (!pw) return { label: '', level: '' };
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+        if (/\d/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        if (score <= 1) return { label: 'Weak', level: 'weak' };
+        if (score <= 3) return { label: 'Medium', level: 'medium' };
+        return { label: 'Strong', level: 'strong' };
+    }
+
+    passwordInput.addEventListener('input', () => {
+        const s = passwordStrength(passwordInput.value);
+        strengthEl.textContent = s.label ? ('Password strength: ' + s.label) : '';
+        strengthEl.className = 'password-strength ' + s.level;
+    });
 
     registerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         const email = document.getElementById('email').value;
         const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const password = passwordInput.value;
+        const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+        if (password !== passwordConfirm) {
+            messageElement.textContent = 'Passwords do not match.';
+            messageElement.classList.remove('text-success', 'text-error');
+            messageElement.classList.add('text-error');
+            return;
+        }
 
         const response = await fetch('/api/account/register/', {
             method: 'POST',

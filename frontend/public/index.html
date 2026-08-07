@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Camagru</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/spectre.min.css">
     <link rel="stylesheet" href="/css/spectre-exp.min.css">
     <link rel="stylesheet" href="/css/spectre-icons.min.css">
@@ -17,25 +14,30 @@
 
 <body>
     <aside class="sidebar">
-        <a href="/list" onclick="navigate(event, 'list')" class="sidebar-brand" id="sidebar-brand">Camagru</a>
+        <a href="/list" onclick="navigate(event, 'list')" class="sidebar-brand" id="sidebar-brand">
+            <img src="/img/camagru-ba.png" alt="Camagru">
+        </a>
         <nav id="nav-links"></nav>
     </aside>
     <div class="app-main">
         <main id="content"></main>
         <footer class="footer">
             <span>Camagru</span>
+            <span class="footer-sep">·</span>
             <a href="/about" onclick="navigate(event, 'about')">About</a>
+            <span class="footer-sep">·</span>
+            <a href="https://github.com/flphth/Camagru" target="_blank" rel="noopener">Source Code</a>
         </footer>
     </div>
 
-    <a id="auth-back" class="auth-back" href="/list" onclick="navigate(event, 'list')" aria-label="Back to gallery">
+    <a id="auth-back" class="auth-back" href="/list" onclick="navigate(event, 'list')" aria-label="Back">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </a>
 
-    <div id="modal-overlay" class="modal-overlay">
-        <div class="modal">
-            <p id="modal-text" class="modal-text"></p>
-            <div class="modal-actions">
+    <div id="modal-overlay" class="confirm-overlay">
+        <div class="confirm-box">
+            <p id="modal-text" class="confirm-text"></p>
+            <div class="confirm-actions">
                 <button id="modal-cancel" class="btn">Cancel</button>
                 <button id="modal-confirm" class="btn btn-error">Delete</button>
             </div>

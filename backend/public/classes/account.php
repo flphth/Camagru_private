@@ -250,6 +250,20 @@ class Account
         }
 
         if (isset($data->password) && $data->password !== '') {
+            // Changing the password requires the current one
+            if (!isset($data->currentPassword) || $data->currentPassword === '') {
+                return ["status" => "error", "message" => "Your current password is required to set a new one."];
+            }
+
+            $pdo = Database::getPDO();
+            $check = $pdo->prepare('SELECT passwordHash FROM User WHERE id = :id');
+            $check->execute(['id' => $userId]);
+            $current = $check->fetch(PDO::FETCH_ASSOC);
+
+            if (!$current || !password_verify($data->currentPassword, $current['passwordHash'])) {
+                return ["status" => "error", "message" => "Your current password is incorrect."];
+            }
+
             if (!$this->validatePassword($data->password)) {
                 return ["status" => "error", "message" => "Password must be at least 8 characters and include upper and lower case letters and a digit."];
             }
