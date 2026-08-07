@@ -35,7 +35,23 @@ if (typeof list === 'undefined') {
             if (!data.images || data.images.length === 0) {
                 const empty = document.createElement('div');
                 empty.className = 'empty-gallery';
-                empty.textContent = t('feed.empty');
+
+                const emptyImg = document.createElement('img');
+                emptyImg.src = '/img/no-message.png';
+                emptyImg.alt = '';
+                emptyImg.className = 'empty-gallery-img';
+
+                const emptyTitle = document.createElement('h2');
+                emptyTitle.className = 'auth-title';
+                emptyTitle.textContent = t('feed.emptyTitle');
+
+                const emptyText = document.createElement('p');
+                emptyText.className = 'auth-subtitle';
+                emptyText.textContent = t('feed.empty');
+
+                empty.appendChild(emptyImg);
+                empty.appendChild(emptyTitle);
+                empty.appendChild(emptyText);
                 list.appendChild(empty);
                 renderPagination(data.page, data.totalPages);
                 return;

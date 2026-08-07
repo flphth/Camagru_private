@@ -55,18 +55,12 @@ function renderNav() {
             '<a href="/login" onclick="navigate(event, \'login\')" class="sidebar-link sidebar-bottom">' + NAV_ICONS.login + '<span>' + t('nav.login') + '</span></a>';
     }
 
-    // The brand is only a link when the user is logged in
+    // The brand always links to the gallery
     const brand = document.getElementById('sidebar-brand');
     if (brand) {
-        if (getToken()) {
-            brand.setAttribute('href', '/list');
-            brand.setAttribute('onclick', "navigate(event, 'list')");
-            brand.classList.remove('is-disabled');
-        } else {
-            brand.removeAttribute('href');
-            brand.removeAttribute('onclick');
-            brand.classList.add('is-disabled');
-        }
+        brand.setAttribute('href', '/list');
+        brand.setAttribute('onclick', "navigate(event, 'list')");
+        brand.classList.remove('is-disabled');
     }
 }
 
@@ -156,7 +150,14 @@ function loadContent(page) {
     document.body.classList.toggle('no-sidebar', noSidebarPages.includes(page));
 
     fetch(`${page}.html`)
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                // Unknown route → custom 404 (instead of injecting nginx's default page)
+                page = 'notfound';
+                return fetch('notfound.html').then(r => r.text());
+            }
+            return response.text();
+        })
         .then(data => {
             const content = document.getElementById('content');
             content.innerHTML = data;

@@ -80,6 +80,7 @@ const translations = {
         'edit.selectSticker': 'Please select a sticker first.',
         'edit.webcamNotReady': 'Webcam is not ready yet. Please allow camera access and try again.',
         // Feed
+        'feed.emptyTitle': 'Empty',
         'feed.empty': 'The gallery is empty for now.',
         'feed.like': 'Like',
         'feed.unlike': 'Unlike',
@@ -94,7 +95,10 @@ const translations = {
         'common.delete': 'Delete',
         'common.cancel': 'Cancel',
         'common.ok': 'OK',
-        'common.deleteImage': 'Delete this image?'
+        'common.deleteImage': 'Delete this image?',
+        'notfound.title': 'Page not found',
+        'notfound.text': "The page you're looking for doesn't exist.",
+        'notfound.home': 'Back to gallery'
     },
     fr: {
         'nav.gallery': 'Galerie',
@@ -162,6 +166,7 @@ const translations = {
         'edit.uploadError': "Erreur lors de l'envoi de l'image. Veuillez réessayer.",
         'edit.selectSticker': "Veuillez d'abord sélectionner un filtre.",
         'edit.webcamNotReady': "La webcam n'est pas prête. Autorisez l'accès à la caméra puis réessayez.",
+        'feed.emptyTitle': 'Vide',
         'feed.empty': 'La galerie est vide pour le moment.',
         'feed.like': "J'aime",
         'feed.unlike': "Je n'aime plus",
@@ -175,7 +180,10 @@ const translations = {
         'common.delete': 'Supprimer',
         'common.cancel': 'Annuler',
         'common.ok': 'OK',
-        'common.deleteImage': 'Supprimer cette image ?'
+        'common.deleteImage': 'Supprimer cette image ?',
+        'notfound.title': 'Page introuvable',
+        'notfound.text': "La page que vous cherchez n'existe pas.",
+        'notfound.home': 'Retour à la galerie'
     }
 };
 
