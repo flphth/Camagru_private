@@ -34,7 +34,7 @@ if (typeof profileForm === 'undefined') {
         // Only touch the password when the user is actually changing it
         if (currentPassword !== '' || newPassword !== '' || newPasswordConfirm !== '') {
             if (newPassword !== newPasswordConfirm) {
-                showMessage('New passwords do not match.', false);
+                showMessage(t('profile.mismatch'), false);
                 return;
             }
             payload.currentPassword = currentPassword;
@@ -47,7 +47,7 @@ if (typeof profileForm === 'undefined') {
             body: JSON.stringify(payload)
         });
 
-        showMessage(data.message, data.status === 'success');
+        showMessage(translateServerMessage(data.message), data.status === 'success');
 
         document.getElementById('currentPassword').value = '';
         document.getElementById('newPassword').value = '';

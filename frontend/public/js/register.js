@@ -7,21 +7,21 @@ if (typeof registerForm === 'undefined') {
 
     // Rough client-side strength hint (the server still enforces the real rules)
     function passwordStrength(pw) {
-        if (!pw) return { label: '', level: '' };
+        if (!pw) return '';
         let score = 0;
         if (pw.length >= 8) score++;
         if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
         if (/\d/.test(pw)) score++;
         if (/[^A-Za-z0-9]/.test(pw)) score++;
-        if (score <= 1) return { label: 'Weak', level: 'weak' };
-        if (score <= 3) return { label: 'Medium', level: 'medium' };
-        return { label: 'Strong', level: 'strong' };
+        if (score <= 1) return 'weak';
+        if (score <= 3) return 'medium';
+        return 'strong';
     }
 
     passwordInput.addEventListener('input', () => {
-        const s = passwordStrength(passwordInput.value);
-        strengthEl.textContent = s.label ? ('Password strength: ' + s.label) : '';
-        strengthEl.className = 'password-strength ' + s.level;
+        const level = passwordStrength(passwordInput.value);
+        strengthEl.textContent = level ? (t('register.strength') + t('strength.' + level)) : '';
+        strengthEl.className = 'password-strength ' + level;
     });
 
     registerForm.addEventListener('submit', async (event) => {
@@ -33,7 +33,7 @@ if (typeof registerForm === 'undefined') {
         const passwordConfirm = document.getElementById('passwordConfirm').value;
 
         if (password !== passwordConfirm) {
-            messageElement.textContent = 'Passwords do not match.';
+            messageElement.textContent = t('register.mismatch');
             messageElement.classList.remove('text-success', 'text-error');
             messageElement.classList.add('text-error');
             return;
@@ -56,23 +56,23 @@ if (typeof registerForm === 'undefined') {
 
             const title = document.createElement('h2');
             title.className = 'auth-title';
-            title.textContent = 'Check your email';
+            title.textContent = t('register.checkEmailTitle');
 
             const text = document.createElement('p');
             text.className = 'auth-subtitle';
-            text.textContent = data.message;
+            text.textContent = translateServerMessage(data.message);
 
             const link = document.createElement('a');
             link.className = 'btn btn-primary btn-block';
             link.href = '/login';
-            link.textContent = 'Go to login';
+            link.textContent = t('register.goToLogin');
             link.setAttribute('onclick', "navigate(event, 'login')");
 
             panel.appendChild(title);
             panel.appendChild(text);
             panel.appendChild(link);
         } else {
-            messageElement.textContent = data.message;
+            messageElement.textContent = translateServerMessage(data.message);
             messageElement.classList.remove('text-success', 'text-error');
             messageElement.classList.add('text-error');
         }

@@ -30,7 +30,7 @@
     --radius: 8px;
     --radius-sm: 6px;
     --shadow: 0 1px 2px rgba(16, 24, 40, .05);
-    --sidebar-w: 240px;
+    --sidebar-w: 200px;
 }
 
 *, *::before, *::after {
@@ -80,6 +80,17 @@ button, input, select, textarea {
     padding: 4px 12px;
     margin-bottom: 14px;
     text-decoration: none;
+}
+
+.lang-select {
+    font-size: var(--fs-sm);
+    color: var(--nav-link);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 2px 4px;
+    cursor: pointer;
+    vertical-align: middle;
 }
 
 .sidebar-brand:hover {
@@ -321,12 +332,31 @@ a:active {
 
 /* ---------- Auth pages ---------- */
 .auth-split {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 48px;
     min-height: calc(100vh - 280px);
     flex-wrap: wrap;
+}
+
+.login-bg {
+    position: absolute;
+    z-index: 0;
+    left: 50%;
+    bottom: 4px;
+    transform: translateX(-89%);
+    width: 586px;
+    max-width: 90%;
+    opacity: 0.12;
+    pointer-events: none;
+}
+
+.auth-hero,
+.auth-panel {
+    position: relative;
+    z-index: 1;
 }
 
 .auth-hero {
@@ -418,7 +448,13 @@ a:active {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    color: var(--muted);
+}
+
+.auth-back,
+.auth-back:visited,
+.auth-back:hover,
+.auth-back:focus {
+    color: var(--nav-link);
 }
 
 .auth-back:hover {
@@ -966,4 +1002,13 @@ a:active {
 /* Auth screens hide the sidebar entirely (desktop + mobile) */
 body.no-sidebar .sidebar {
     display: none;
+}
+
+/* Login background repositioned on small screens */
+@media (max-width: 767px) {
+    .login-bg {
+        bottom: 330px;
+        transform: translateX(-52%);
+        width: 584px;
+    }
 }

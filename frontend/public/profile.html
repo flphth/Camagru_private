@@ -1,45 +1,45 @@
 <div class="profile">
-    <h2 class="auth-title">Edit profile</h2>
+    <h2 class="auth-title" data-i18n="profile.title">Edit profile</h2>
 
     <div class="profile-head">
         <div class="avatar profile-avatar" id="profile-avatar">?</div>
         <div class="profile-head-info">
             <div class="profile-head-name" id="profile-username">username</div>
-            <div class="profile-head-sub">Manage your account details</div>
+            <div class="profile-head-sub" data-i18n="profile.sub">Manage your account details</div>
         </div>
     </div>
 
     <form id="profile">
         <div class="form-group">
-            <label class="form-label" for="username">Username</label>
-            <input class="form-input" type="text" id="username" placeholder="Username">
+            <label class="form-label" for="username" data-i18n="profile.username">Username</label>
+            <input class="form-input" type="text" id="username" placeholder="Username" data-i18n-ph="profile.username">
         </div>
         <div class="form-group">
-            <label class="form-label" for="email">Email</label>
-            <input class="form-input" type="email" id="email" placeholder="Email">
+            <label class="form-label" for="email" data-i18n="profile.email">Email</label>
+            <input class="form-input" type="email" id="email" placeholder="Email" data-i18n-ph="profile.email">
         </div>
         <div class="form-group">
             <label class="form-switch">
                 <input type="checkbox" id="notifyOnComment">
-                <i class="form-icon"></i> Email me when someone comments on my images
+                <i class="form-icon"></i> <span data-i18n="profile.notify">Email me when someone comments on my images</span>
             </label>
         </div>
 
-        <h3 class="profile-section-title">Change password</h3>
+        <h3 class="profile-section-title" data-i18n="profile.changePassword">Change password</h3>
         <div class="form-group">
-            <label class="form-label" for="currentPassword">Current password</label>
-            <input class="form-input" type="password" id="currentPassword" placeholder="Current password">
+            <label class="form-label" for="currentPassword" data-i18n="profile.currentPassword">Current password</label>
+            <input class="form-input" type="password" id="currentPassword" placeholder="Current password" data-i18n-ph="profile.currentPassword">
         </div>
         <div class="form-group">
-            <label class="form-label" for="newPassword">New password</label>
-            <input class="form-input" type="password" id="newPassword" placeholder="New password">
+            <label class="form-label" for="newPassword" data-i18n="profile.newPassword">New password</label>
+            <input class="form-input" type="password" id="newPassword" placeholder="New password" data-i18n-ph="profile.newPassword">
         </div>
         <div class="form-group">
-            <label class="form-label" for="newPasswordConfirm">Confirm new password</label>
-            <input class="form-input" type="password" id="newPasswordConfirm" placeholder="Confirm new password">
+            <label class="form-label" for="newPasswordConfirm" data-i18n="profile.confirmNewPassword">Confirm new password</label>
+            <input class="form-input" type="password" id="newPasswordConfirm" placeholder="Confirm new password" data-i18n-ph="profile.confirmNewPassword">
         </div>
 
-        <button class="btn btn-primary btn-block" type="submit">Save changes</button>
+        <button class="btn btn-primary btn-block" type="submit" data-i18n="profile.save">Save changes</button>
         <div id="message" class="message mt-2"></div>
     </form>
 </div>

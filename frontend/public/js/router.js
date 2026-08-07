@@ -45,15 +45,14 @@ function renderNav() {
 
     if (getToken()) {
         nav.innerHTML =
-            '<a href="/list" onclick="navigate(event, \'list\')" class="sidebar-link">' + NAV_ICONS.gallery + '<span>Gallery</span></a>' +
-            '<a href="/home" onclick="navigate(event, \'home\')" class="sidebar-link">' + NAV_ICONS.editing + '<span>Create</span></a>' +
-            '<a href="/profile" onclick="navigate(event, \'profile\')" class="sidebar-link sidebar-bottom">' + NAV_ICONS.profile + '<span>Profile</span></a>' +
-            '<a href="/logout" onclick="logout(event)" class="sidebar-link">' + NAV_ICONS.logout + '<span>Logout</span></a>';
+            '<a href="/list" onclick="navigate(event, \'list\')" class="sidebar-link">' + NAV_ICONS.gallery + '<span>' + t('nav.gallery') + '</span></a>' +
+            '<a href="/home" onclick="navigate(event, \'home\')" class="sidebar-link">' + NAV_ICONS.editing + '<span>' + t('nav.create') + '</span></a>' +
+            '<a href="/profile" onclick="navigate(event, \'profile\')" class="sidebar-link sidebar-bottom">' + NAV_ICONS.profile + '<span>' + t('nav.profile') + '</span></a>' +
+            '<a href="/logout" onclick="logout(event)" class="sidebar-link">' + NAV_ICONS.logout + '<span>' + t('nav.logout') + '</span></a>';
     } else {
         nav.innerHTML =
-            '<a href="/list" onclick="navigate(event, \'list\')" class="sidebar-link">' + NAV_ICONS.gallery + '<span>Gallery</span></a>' +
-            '<a href="/register" onclick="navigate(event, \'register\')" class="sidebar-link sidebar-bottom">' + NAV_ICONS.register + '<span>Register</span></a>' +
-            '<a href="/login" onclick="navigate(event, \'login\')" class="sidebar-link">' + NAV_ICONS.login + '<span>Login</span></a>';
+            '<a href="/list" onclick="navigate(event, \'list\')" class="sidebar-link">' + NAV_ICONS.gallery + '<span>' + t('nav.gallery') + '</span></a>' +
+            '<a href="/login" onclick="navigate(event, \'login\')" class="sidebar-link sidebar-bottom">' + NAV_ICONS.login + '<span>' + t('nav.login') + '</span></a>';
     }
 
     // The brand is only a link when the user is logged in
@@ -86,13 +85,18 @@ function navigate(event, page) {
 }
 
 window.onpopstate = function () {
-    const path = window.location.pathname.split('/')[1];
+    const path = window.location.pathname.split('/')[1] || (getToken() ? 'home' : 'list');
     loadContent(path);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    initI18n();
     renderNav();
-    const initialPage = window.location.pathname.split('/')[1] || 'home';
+    // Root URL: logged-in users land on the editor, visitors on the public gallery
+    let initialPage = window.location.pathname.split('/')[1];
+    if (!initialPage) {
+        initialPage = getToken() ? 'home' : 'list';
+    }
     loadContent(initialPage);
 });
 
@@ -133,15 +137,21 @@ function openModal({ message, confirmText, confirmClass, showCancel }) {
 
 // Confirmation before a destructive action
 function confirmAction(message) {
-    return openModal({ message, confirmText: 'Delete', confirmClass: 'btn-error', showCancel: true });
+    return openModal({ message, confirmText: t('common.delete'), confirmClass: 'btn-error', showCancel: true });
 }
 
 // Informational dialog replacing native alert()
 function alertModal(message) {
-    return openModal({ message, confirmText: 'OK', confirmClass: 'btn-primary', showCancel: false });
+    return openModal({ message, confirmText: t('common.ok'), confirmClass: 'btn-primary', showCancel: false });
 }
 
 function loadContent(page) {
+    // Stop the webcam when leaving the editor (otherwise the camera stays on)
+    if (window.currentStream) {
+        window.currentStream.getTracks().forEach(track => track.stop());
+        window.currentStream = null;
+    }
+
     const noSidebarPages = ['login', 'register', 'forgot', 'reset', 'activate', 'about'];
     document.body.classList.toggle('no-sidebar', noSidebarPages.includes(page));
 
@@ -167,6 +177,8 @@ function loadContent(page) {
                     block.insertBefore(back, block.firstChild);
                 }
             }
+
+            applyI18n(content);
 
             if (page === 'home') {
                 const script = document.createElement('script');

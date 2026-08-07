@@ -35,7 +35,7 @@ if (typeof list === 'undefined') {
             if (!data.images || data.images.length === 0) {
                 const empty = document.createElement('div');
                 empty.className = 'empty-gallery';
-                empty.textContent = 'The gallery is empty for now.';
+                empty.textContent = t('feed.empty');
                 list.appendChild(empty);
                 renderPagination(data.page, data.totalPages);
                 return;
@@ -88,7 +88,7 @@ if (typeof list === 'undefined') {
         if (isConnected && Number(image.userId) === currentUserId) {
             const remove = document.createElement('button');
             remove.className = 'btn btn-error btn-sm post-delete';
-            remove.textContent = 'Delete';
+            remove.textContent = t('common.delete');
             remove.addEventListener('click', () => deleteImage(image.id));
             head.appendChild(remove);
         }
@@ -113,11 +113,11 @@ if (typeof list === 'undefined') {
         if (isConnected) {
             const like = document.createElement('button');
             like.className = 'btn btn-success btn-sm';
-            like.innerHTML = THUMB_UP + '<span>Like</span>';
+            like.innerHTML = THUMB_UP + '<span>' + t('feed.like') + '</span>';
             like.addEventListener('click', () => likeImage(imageId));
             const unlike = document.createElement('button');
             unlike.className = 'btn btn-sm';
-            unlike.innerHTML = THUMB_DOWN + '<span>Unlike</span>';
+            unlike.innerHTML = THUMB_DOWN + '<span>' + t('feed.unlike') + '</span>';
             unlike.addEventListener('click', () => unlikeImage(imageId));
             actions.appendChild(like);
             actions.appendChild(unlike);
@@ -131,7 +131,7 @@ if (typeof list === 'undefined') {
         count.textContent = '0';
         const label = document.createElement('span');
         label.className = 'like-label';
-        label.textContent = ' likes';
+        label.textContent = t('feed.likes');
         countWrap.appendChild(count);
         countWrap.appendChild(label);
         actions.appendChild(countWrap);
@@ -154,7 +154,7 @@ if (typeof list === 'undefined') {
             const input = document.createElement('input');
             input.className = 'form-input';
             input.type = 'text';
-            input.placeholder = 'Add a comment…';
+            input.placeholder = t('feed.addComment');
             const send = document.createElement('button');
             send.className = 'btn btn-primary btn-sm comment-send';
             send.setAttribute('aria-label', 'Post comment');
@@ -221,10 +221,10 @@ if (typeof list === 'undefined') {
                 body: JSON.stringify({ imageId, content })
             });
             if (data && data.status === 'success') {
-                appendComment(imageId, content, 'Just now');
+                appendComment(imageId, content, t('feed.justNow'));
                 inputEl.value = '';
             } else {
-                alertModal((data && data.message) ? data.message : 'Failed to submit comment.');
+                alertModal((data && data.message) ? translateServerMessage(data.message) : t('feed.commentFailed'));
             }
         } catch (error) {
             console.error('Error:', error);
@@ -240,7 +240,7 @@ if (typeof list === 'undefined') {
         if (data && data.status === 'success') {
             fetchLikes(imageId);
         } else if (data && data.message) {
-            alertModal(data.message);
+            alertModal(translateServerMessage(data.message));
         }
     }
 
@@ -253,12 +253,12 @@ if (typeof list === 'undefined') {
         if (data && data.status === 'success') {
             fetchLikes(imageId);
         } else if (data && data.message) {
-            alertModal(data.message);
+            alertModal(translateServerMessage(data.message));
         }
     }
 
     async function deleteImage(imageId) {
-        if (!(await confirmAction('Delete this image?'))) return;
+        if (!(await confirmAction(t('common.deleteImage')))) return;
 
         const data = await fetchWithAuth('/api/image/delete/', {
             method: 'POST',
@@ -268,7 +268,7 @@ if (typeof list === 'undefined') {
         if (data && data.status === 'success') {
             fetchImages(currentPage);
         } else if (data && data.message) {
-            alertModal(data.message);
+            alertModal(translateServerMessage(data.message));
         }
     }
 
@@ -293,17 +293,17 @@ if (typeof list === 'undefined') {
 
         const prev = document.createElement('button');
         prev.className = 'btn btn-sm';
-        prev.textContent = 'Previous';
+        prev.textContent = t('feed.prev');
         prev.disabled = page <= 1;
         prev.addEventListener('click', () => gotoPage(page - 1));
 
         const info = document.createElement('span');
         info.className = 'page-info';
-        info.textContent = 'Page ' + page + ' / ' + totalPages;
+        info.textContent = t('feed.page') + ' ' + page + ' / ' + totalPages;
 
         const next = document.createElement('button');
         next.className = 'btn btn-sm';
-        next.textContent = 'Next';
+        next.textContent = t('feed.next');
         next.disabled = page >= totalPages;
         next.addEventListener('click', () => gotoPage(page + 1));
 

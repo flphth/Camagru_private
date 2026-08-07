@@ -18,7 +18,7 @@ if (typeof resetForm === 'undefined') {
         });
 
         const data = await response.json();
-        messageElement.textContent = data.message;
+        messageElement.textContent = translateServerMessage(data.message);
         messageElement.classList.remove('text-success', 'text-error');
         messageElement.classList.add(data.status === 'success' ? 'text-success' : 'text-error');
     });

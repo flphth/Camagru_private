@@ -24,9 +24,14 @@
         <footer class="footer">
             <span>Camagru</span>
             <span class="footer-sep">·</span>
-            <a href="/about" onclick="navigate(event, 'about')">About</a>
+            <select id="lang-select" class="lang-select" aria-label="Language">
+                <option value="en">EN</option>
+                <option value="fr">FR</option>
+            </select>
             <span class="footer-sep">·</span>
-            <a href="https://github.com/flphth/Camagru" target="_blank" rel="noopener">Source code<svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+            <a href="/about" onclick="navigate(event, 'about')" data-i18n="footer.about">About</a>
+            <span class="footer-sep">·</span>
+            <a href="https://github.com/flphth/Camagru" target="_blank" rel="noopener"><span data-i18n="footer.source">Source code</span><svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
         </footer>
     </div>
 
@@ -34,12 +39,13 @@
         <div class="confirm-box">
             <p id="modal-text" class="confirm-text"></p>
             <div class="confirm-actions">
-                <button id="modal-cancel" class="btn">Cancel</button>
+                <button id="modal-cancel" class="btn" data-i18n="common.cancel">Cancel</button>
                 <button id="modal-confirm" class="btn btn-error">Delete</button>
             </div>
         </div>
     </div>
 
+    <script src="/js/i18n.js"></script>
     <script src="/js/router.js"></script>
 </body>
 

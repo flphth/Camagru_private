@@ -4,13 +4,13 @@
         <canvas id="canvasElement"></canvas>
         <div id="sticker"></div>
         <div class="editor-actions">
-            <button class="imageButton" id="deselectImage">Deselect</button>
-            <button class="imageButton" id="uploadImage">Capture</button>
+            <button class="imageButton" id="deselectImage" data-i18n="edit.deselect">Deselect</button>
+            <button class="imageButton" id="uploadImage" data-i18n="edit.capture">Capture</button>
         </div>
         <div class="editor-upload">
-            <label for="fileInput" class="btn upload-btn">Upload an image</label>
+            <label for="fileInput" class="btn upload-btn" data-i18n="edit.upload">Upload an image</label>
             <input type="file" id="fileInput" accept="image/png, image/jpeg" class="upload-input">
-            <div class="editor-upload-hint">No webcam? Upload a picture instead.</div>
+            <div class="editor-upload-hint" data-i18n="edit.uploadHint">No webcam? Upload a picture instead.</div>
         </div>
     </section>
     <aside class="editor-side">

@@ -12,7 +12,7 @@ if (typeof activateMessage === 'undefined') {
         try {
             const response = await fetch('/api/account/activate/' + encodeURIComponent(hash));
             const data = await response.json();
-            activateMessage.textContent = data.message;
+            activateMessage.textContent = translateServerMessage(data.message);
         } catch (error) {
             activateMessage.textContent = 'Activation failed. Please try again later.';
         }

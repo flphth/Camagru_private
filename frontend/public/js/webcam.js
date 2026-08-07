@@ -16,7 +16,7 @@ if (typeof video === 'undefined') {
     (async () => {
         const auth = await fetchWithAuth('/api/account/check/');
         if (!auth || auth.status !== 'connected') {
-            await alertModal('You must be logged in to access the editing page.');
+            await alertModal(t('edit.needLogin'));
             history.pushState(null, '', '/login');
             loadContent('login');
         }
@@ -25,6 +25,7 @@ if (typeof video === 'undefined') {
     // Request access to the webcam
     navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
+            window.currentStream = stream;
             video.srcObject = stream;
         })
         .catch((error) => {
@@ -68,21 +69,21 @@ if (typeof video === 'undefined') {
             history.pushState(null, '', '/list?highlight=' + data.imageId);
             loadContent('list');
         } else {
-            alertModal((data && data.message) ? data.message : 'Image upload error. Please try again.');
+            alertModal((data && data.message) ? translateServerMessage(data.message) : t('edit.uploadError'));
         }
     }
 
     // Capture the current frame and send it to the server for merging
     async function uploadImage() {
         if (overlayStickers.length === 0) {
-            alertModal('Please select a sticker first.');
+            alertModal(t('edit.selectSticker'));
             return;
         }
 
         const width = canvas.width || video.videoWidth;
         const height = canvas.height || video.videoHeight;
         if (!width || !height) {
-            alertModal('Webcam is not ready yet. Please allow camera access and try again.');
+            alertModal(t('edit.webcamNotReady'));
             return;
         }
 
@@ -94,7 +95,7 @@ if (typeof video === 'undefined') {
 
             await sendImage(tempCanvas.toDataURL('image/png'));
         } catch (error) {
-            alertModal('Image upload error. Please try again.');
+            alertModal(t('edit.uploadError'));
         }
     }
 
@@ -123,7 +124,7 @@ if (typeof video === 'undefined') {
                 try {
                     await sendImage(tempCanvas.toDataURL('image/png'));
                 } catch (error) {
-                    alertModal('Image upload error. Please try again.');
+                    alertModal(t('edit.uploadError'));
                 }
                 fileInput.value = '';
             };
@@ -172,7 +173,7 @@ if (typeof video === 'undefined') {
 
             const remove = document.createElement('button');
             remove.className = 'btn btn-error btn-sm';
-            remove.textContent = 'Delete';
+            remove.textContent = t('common.delete');
             remove.addEventListener('click', () => deleteImage(image.id));
 
             wrap.appendChild(img);
@@ -183,7 +184,7 @@ if (typeof video === 'undefined') {
 
     // Delete one of the user's own images
     async function deleteImage(imageId) {
-        if (!(await confirmAction('Delete this image?'))) return;
+        if (!(await confirmAction(t('common.deleteImage')))) return;
 
         const data = await fetchWithAuth('/api/image/delete/', {
             method: 'POST',
@@ -193,7 +194,7 @@ if (typeof video === 'undefined') {
         if (data && data.status === 'success') {
             loadThumbnails();
         } else if (data && data.message) {
-            alertModal(data.message);
+            alertModal(translateServerMessage(data.message));
         }
     }
 
