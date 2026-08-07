@@ -140,6 +140,25 @@ class Image
         ];
     }
 
+    // Get a single image with its author (for the shared post page) — public
+    public function one($token, $param)
+    {
+        $pdo = Database::getPDO();
+        $stmt = $pdo->prepare(
+            'SELECT Image.id, Image.userId, Image.imagePath, Image.createdAt, User.username
+             FROM Image JOIN User ON Image.userId = User.id
+             WHERE Image.id = :id'
+        );
+        $stmt->execute(['id' => (int)$param]);
+        $image = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$image) {
+            return ["status" => "error", "message" => "Image not found."];
+        }
+
+        return ["status" => "success", "image" => $image];
+    }
+
     // Get the images owned by the connected user (for the editing page side panel)
     public function mine($token)
     {

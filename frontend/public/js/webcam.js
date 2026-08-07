@@ -113,9 +113,25 @@ if (typeof video === 'undefined') {
         const file = fileInput.files[0];
         if (!file) return;
 
+        // Reject anything that isn't a PNG/JPEG or is over 5 MB
+        if (file.type !== 'image/png' && file.type !== 'image/jpeg') {
+            alertModal(t('edit.badType'));
+            fileInput.value = '';
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            alertModal(t('edit.tooLarge'));
+            fileInput.value = '';
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = () => {
             const img = new Image();
+            img.onerror = () => {
+                alertModal(t('edit.badType'));
+                fileInput.value = '';
+            };
             img.onload = async () => {
                 const maxWidth = 640;
                 let width = img.naturalWidth;
@@ -179,8 +195,12 @@ if (typeof video === 'undefined') {
         const data = await fetchWithAuth('/api/image/mine/');
         if (!data || data.status !== 'success') return;
 
+        // Only show the side panel when the user actually has pictures
+        const side = thumbnails.closest('.editor-side');
+        if (side) side.style.display = data.images.length ? '' : 'none';
+
         thumbnails.innerHTML = '';
-        data.images.forEach(image => {
+        data.images.slice(0, 4).forEach(image => {
             const wrap = document.createElement('div');
             wrap.className = 'thumbnail';
 

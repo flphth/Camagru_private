@@ -9,16 +9,62 @@ if (typeof list === 'undefined') {
     const THUMB_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
     const THUMB_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>';
 
+    const SHARE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+
+    // Close any open share menu when clicking outside (bound once for the whole app)
+    if (!window.__shareOutsideBound) {
+        window.__shareOutsideBound = true;
+        document.addEventListener('click', (e) => {
+            document.querySelectorAll('.share-wrap.open').forEach(w => {
+                if (!w.contains(e.target)) w.classList.remove('open');
+            });
+        });
+    }
+
     (async () => {
         const auth = await fetchWithAuth('/api/account/check/');
         isConnected = !!(auth && auth.status === 'connected');
         currentUserId = (auth && auth.userId) ? Number(auth.userId) : 0;
+
+        // Single shared-post page: /post/<id>
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts[1] === 'post' && pathParts[2]) {
+            fetchSinglePost(pathParts[2]);
+            return;
+        }
 
         const params = new URLSearchParams(window.location.search);
         currentPage = Math.max(1, parseInt(params.get('page') || '1', 10));
         pendingHighlight = params.get('highlight');
         fetchImages(currentPage);
     })();
+
+    async function fetchSinglePost(id) {
+        try {
+            const response = await fetch('/api/image/one/' + id);
+            const data = await response.json();
+
+            list.innerHTML = '';
+
+            if (!data || data.status !== 'success' || !data.image) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-gallery';
+                const msg = document.createElement('p');
+                msg.className = 'auth-subtitle';
+                msg.textContent = t('feed.postNotFound');
+                empty.appendChild(msg);
+                list.appendChild(empty);
+                return;
+            }
+
+            const image = data.image;
+            list.appendChild(buildPost(image));
+            fetchComments(image.id);
+            fetchLikes(image.id);
+        } catch (error) {
+            console.error('Error fetching post:', error);
+        }
+    }
 
     async function fetchImages(page) {
         try {
@@ -117,12 +163,13 @@ if (typeof list === 'undefined') {
 
         post.appendChild(head);
         post.appendChild(imgWrap);
-        post.appendChild(buildActions(image.id));
+        post.appendChild(buildActions(image));
         post.appendChild(buildComments(image.id));
         return post;
     }
 
-    function buildActions(imageId) {
+    function buildActions(image) {
+        const imageId = image.id;
         const actions = document.createElement('div');
         actions.className = 'post-actions';
 
@@ -151,8 +198,64 @@ if (typeof list === 'undefined') {
         countWrap.appendChild(count);
         countWrap.appendChild(label);
         actions.appendChild(countWrap);
+        actions.appendChild(buildShare(image));
 
         return actions;
+    }
+
+    function buildShare(image) {
+        const wrap = document.createElement('div');
+        wrap.className = 'share-wrap';
+
+        const url = window.location.origin + '/post/' + image.id;
+        const text = t('feed.shareText');
+        const enc = encodeURIComponent;
+
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-sm share-btn';
+        btn.setAttribute('aria-label', t('feed.share'));
+        btn.innerHTML = SHARE_ICON + '<span>' + t('feed.share') + '</span>';
+
+        const menu = document.createElement('div');
+        menu.className = 'share-menu';
+
+        [
+            { label: 'X', href: 'https://twitter.com/intent/tweet?text=' + enc(text) + '&url=' + enc(url) },
+            { label: 'Facebook', href: 'https://www.facebook.com/sharer/sharer.php?u=' + enc(url) },
+            { label: 'WhatsApp', href: 'https://api.whatsapp.com/send?text=' + enc(text + ' ' + url) }
+        ].forEach(n => {
+            const a = document.createElement('a');
+            a.href = n.href;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.className = 'share-link';
+            a.textContent = n.label;
+            menu.appendChild(a);
+        });
+
+        const copy = document.createElement('button');
+        copy.className = 'share-link';
+        copy.textContent = t('feed.copyLink');
+        copy.addEventListener('click', () => {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).catch(() => {});
+            }
+            copy.textContent = t('feed.copied');
+            setTimeout(() => { copy.textContent = t('feed.copyLink'); }, 1500);
+        });
+        menu.appendChild(copy);
+
+        btn.addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({ title: 'Camagru', text: text, url: url }).catch(() => {});
+            } else {
+                wrap.classList.toggle('open');
+            }
+        });
+
+        wrap.appendChild(btn);
+        wrap.appendChild(menu);
+        return wrap;
     }
 
     function buildComments(imageId) {
@@ -282,7 +385,13 @@ if (typeof list === 'undefined') {
             body: JSON.stringify({ imageId })
         });
         if (data && data.status === 'success') {
-            fetchImages(currentPage);
+            if (window.location.pathname.split('/')[1] === 'post') {
+                // Deleted from the single-post page → back to the gallery
+                history.pushState(null, '', '/list');
+                loadContent('list');
+            } else {
+                fetchImages(currentPage);
+            }
         } else if (data && data.message) {
             alertModal(translateServerMessage(data.message));
         }
