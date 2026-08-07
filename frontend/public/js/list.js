@@ -156,8 +156,9 @@ if (typeof list === 'undefined') {
             input.type = 'text';
             input.placeholder = 'Add a comment…';
             const send = document.createElement('button');
-            send.className = 'btn btn-primary btn-sm';
-            send.textContent = 'Post';
+            send.className = 'btn btn-primary btn-sm comment-send';
+            send.setAttribute('aria-label', 'Post comment');
+            send.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
             send.addEventListener('click', () => addComment(imageId, input));
             group.appendChild(input);
             group.appendChild(send);
@@ -223,7 +224,7 @@ if (typeof list === 'undefined') {
                 appendComment(imageId, content, 'Just now');
                 inputEl.value = '';
             } else {
-                alert((data && data.message) ? data.message : 'Failed to submit comment.');
+                alertModal((data && data.message) ? data.message : 'Failed to submit comment.');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -239,7 +240,7 @@ if (typeof list === 'undefined') {
         if (data && data.status === 'success') {
             fetchLikes(imageId);
         } else if (data && data.message) {
-            alert(data.message);
+            alertModal(data.message);
         }
     }
 
@@ -252,7 +253,7 @@ if (typeof list === 'undefined') {
         if (data && data.status === 'success') {
             fetchLikes(imageId);
         } else if (data && data.message) {
-            alert(data.message);
+            alertModal(data.message);
         }
     }
 
@@ -267,7 +268,7 @@ if (typeof list === 'undefined') {
         if (data && data.status === 'success') {
             fetchImages(currentPage);
         } else if (data && data.message) {
-            alert(data.message);
+            alertModal(data.message);
         }
     }
 

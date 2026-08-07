@@ -2,6 +2,7 @@
    Camagru — Instagram-inspired light theme (layered on top of Spectre)
  * ------------------------------------------------------------------ */
 :root {
+    /* Colors */
     --bg: #ffffff;
     --surface: #ffffff;
     --surface-2: #fafafa;
@@ -11,8 +12,21 @@
     --accent: #2e6ff2;
     --accent-hover: #2159d6;
     --accent-soft: #e9f0fe;
+    --nav-link: #737373;
     --danger: #ed4956;
     --success: #10b981;
+
+    /* Type scale (absolute px, independent of Spectre's root size) */
+    --fs-xs: 12px;
+    --fs-sm: 14px;
+    --fs-base: 16px;
+    --fs-md: 18px;
+    --fs-lg: 20px;
+    --fs-xl: 24px;
+    --fs-2xl: 32px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    /* Metrics */
     --radius: 8px;
     --radius-sm: 6px;
     --shadow: 0 1px 2px rgba(16, 24, 40, .05);
@@ -34,11 +48,18 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font);
+    font-size: var(--fs-base);
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
 }
 
-/* Left sidebar navigation */
+/* Keep form controls on the same font as everything else */
+button, input, select, textarea {
+    font-family: inherit;
+}
+
+/* ---------- Sidebar ---------- */
 .sidebar {
     width: var(--sidebar-w);
     flex-shrink: 0;
@@ -61,13 +82,13 @@ body {
     text-decoration: none;
 }
 
+.sidebar-brand:hover {
+    text-decoration: none;
+}
+
 .sidebar-brand img {
     height: 42px;
     display: block;
-}
-
-.sidebar-brand:hover {
-    text-decoration: none;
 }
 
 .sidebar-brand.is-disabled {
@@ -82,18 +103,15 @@ body {
     gap: 4px;
 }
 
-.sidebar-bottom {
-    margin-top: auto;
-}
-
 .sidebar-link {
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 12px;
     border-radius: var(--radius);
-    color: var(--text);
+    color: var(--nav-link);
     text-decoration: none;
+    font-size: var(--fs-base);
     font-weight: 500;
     transition: background .15s ease;
 }
@@ -109,7 +127,11 @@ body {
     flex-shrink: 0;
 }
 
-/* Main column */
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+/* ---------- Main column ---------- */
 .app-main {
     flex: 1;
     min-width: 0;
@@ -126,7 +148,7 @@ body {
     padding: 28px 20px 60px;
 }
 
-/* Buttons (Spectre .btn overrides) */
+/* ---------- Buttons (Spectre .btn overrides) ---------- */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -138,6 +160,7 @@ body {
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
+    font-size: var(--fs-sm);
     font-weight: 500;
     text-align: center;
     transition: background .15s ease, border-color .15s ease, color .15s ease;
@@ -183,6 +206,7 @@ body {
 .btn.btn-error:hover {
     background: #fef2f3;
     border-color: var(--danger);
+    color: var(--danger);
 }
 
 .btn.btn-link {
@@ -201,14 +225,15 @@ body {
     width: 100%;
     margin-top: 8px;
     padding: 12px;
+    font-size: var(--fs-base);
     font-weight: 600;
 }
 
-/* Forms */
+/* ---------- Forms ---------- */
 .form-input {
     height: auto;
     padding: 11px 14px;
-    font-size: 1rem;
+    font-size: var(--fs-base);
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--surface-2);
@@ -224,6 +249,7 @@ body {
 .form-label {
     display: block;
     text-align: left;
+    font-size: var(--fs-sm);
     font-weight: 600;
     color: var(--text);
 }
@@ -240,13 +266,66 @@ body {
     color: var(--muted) !important;
 }
 
-/* Auth pages */
+/* Recolor Spectre's default purple (#5755d9 / #807fe2 / #302ecd) to the blue accent.
+   Spectre styles a:visited / a:hover / a:focus, which out-rank plain class colors,
+   so we restate the classed link colors across those states too. */
+a,
+a:visited {
+    color: var(--accent);
+}
+
+a:hover,
+a:focus,
+a:active {
+    color: var(--accent-hover);
+}
+
+.sidebar-link,
+.sidebar-link:visited,
+.sidebar-link:hover,
+.sidebar-link:focus {
+    color: var(--nav-link);
+}
+
+.footer a,
+.footer a:visited {
+    color: var(--muted);
+}
+
+.footer a:hover,
+.footer a:focus {
+    color: var(--text);
+}
+
+.auth-link,
+.auth-link:visited,
+.auth-link:hover,
+.auth-link:focus {
+    color: var(--accent);
+}
+
+.form-checkbox input:checked + .form-icon,
+.form-radio input:checked + .form-icon,
+.form-switch input:checked + .form-icon {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.form-checkbox input:focus + .form-icon,
+.form-radio input:focus + .form-icon,
+.form-switch input:focus + .form-icon,
+.btn:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 .1rem var(--accent-soft);
+}
+
+/* ---------- Auth pages ---------- */
 .auth-split {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 48px;
-    min-height: calc(100vh - 140px);
+    min-height: calc(100vh - 280px);
     flex-wrap: wrap;
 }
 
@@ -256,18 +335,19 @@ body {
 }
 
 .auth-hero h1 {
-    font-size: 2.4rem;
+    font-size: var(--fs-2xl);
     line-height: 1.15;
     font-weight: 700;
     margin: 0 0 14px;
 }
 
 .auth-hero p {
+    font-size: var(--fs-md);
     color: var(--muted);
-    font-size: 1.1rem;
     margin: 0;
 }
 
+/* Login keeps a card panel; register/forgot/reset are box-less */
 .auth-panel {
     flex: 0 1 360px;
     width: 100%;
@@ -279,37 +359,133 @@ body {
     padding: 32px 28px;
 }
 
-.auth-centered {
-    margin: 40px auto;
+.auth-form {
+    max-width: 380px;
+    margin: 20px auto;
+}
+
+.auth-plain {
+    max-width: 360px;
+    margin: 60px auto;
+    text-align: center;
 }
 
 .auth-title {
-    font-size: 1.5rem;
+    font-size: var(--fs-xl);
     font-weight: 700;
     margin: 0 0 6px;
 }
 
 .auth-subtitle {
+    font-size: var(--fs-base);
     color: var(--muted);
     margin: 0 0 20px;
-    font-size: .95rem;
 }
 
 .auth-link {
     display: block;
     text-align: center;
     margin-top: 16px;
+    font-size: var(--fs-base);
     color: var(--accent);
     text-decoration: none;
     font-weight: 600;
-    font-size: .9rem;
 }
 
 .auth-link:hover {
     text-decoration: underline;
 }
 
-/* Profile ("Edit profile") page */
+.register-cta {
+    margin-top: 12px;
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--surface);
+    font-weight: 600;
+}
+
+.register-cta:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Back button, shown only on auth screens (no sidebar) */
+.auth-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--muted);
+}
+
+.auth-back:hover {
+    background: var(--surface-2);
+    text-decoration: none;
+}
+
+.auth-back svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* Back button sits just to the left of the centered content block */
+.has-back {
+    position: relative;
+}
+
+.has-back .auth-back {
+    position: absolute;
+    top: -24px;
+    left: -52px;
+}
+
+@media (max-width: 700px) {
+    .has-back .auth-back {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        background: var(--surface);
+        z-index: 40;
+    }
+}
+
+/* Brand logos on auth screens */
+.hero-logo {
+    height: 80px;
+    display: block;
+    margin-bottom: 22px;
+}
+
+.auth-logo {
+    height: 65px;
+    display: block;
+    margin: 0 0 18px;
+}
+
+/* Password strength hint (register) */
+.password-strength {
+    margin-top: 6px;
+    min-height: 1em;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+}
+
+.password-strength.weak {
+    color: var(--danger);
+}
+
+.password-strength.medium {
+    color: #c77700;
+}
+
+.password-strength.strong {
+    color: var(--success);
+}
+
+/* ---------- Profile ("Edit profile") ---------- */
 .profile {
     max-width: 560px;
     margin: 40px auto;
@@ -328,27 +504,28 @@ body {
 .profile-avatar {
     width: 56px;
     height: 56px;
-    font-size: 1.4rem;
+    font-size: var(--fs-xl);
 }
 
 .profile-head-name {
+    font-size: var(--fs-base);
     font-weight: 700;
 }
 
 .profile-head-sub {
-    font-size: .85rem;
+    font-size: var(--fs-sm);
     color: var(--muted);
 }
 
 .profile-section-title {
-    font-size: 1.05rem;
+    font-size: var(--fs-lg);
     font-weight: 700;
     margin: 28px 0 12px;
     padding-top: 22px;
     border-top: 1px solid var(--border);
 }
 
-/* Feed (gallery posts) */
+/* ---------- Feed (gallery posts) ---------- */
 .post {
     max-width: 480px;
     margin: 0 auto 28px;
@@ -357,6 +534,11 @@ body {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     overflow: hidden;
+}
+
+.post.is-highlight {
+    box-shadow: 0 0 0 2px var(--accent);
+    transition: box-shadow .3s ease;
 }
 
 .post-head {
@@ -375,8 +557,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: var(--fs-base);
     font-weight: 700;
-    font-size: .95rem;
     flex-shrink: 0;
 }
 
@@ -387,12 +569,12 @@ body {
 }
 
 .post-user {
+    font-size: var(--fs-sm);
     font-weight: 600;
-    font-size: .9rem;
 }
 
 .post-date {
-    font-size: .72rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 
@@ -414,7 +596,7 @@ body {
 
 .like-count-wrap {
     margin-left: auto;
-    font-size: .85rem;
+    font-size: var(--fs-sm);
 }
 
 .like-count {
@@ -440,11 +622,11 @@ body {
     display: flex;
     gap: 6px;
     align-items: baseline;
-    font-size: .88rem;
+    font-size: var(--fs-sm);
 }
 
 .comment-date {
-    font-size: .68rem;
+    font-size: var(--fs-xs);
     color: var(--muted);
 }
 
@@ -460,18 +642,28 @@ body {
     flex: 1;
 }
 
+.comment-send {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 999px;
+}
+
+.comment-send svg {
+    width: 18px;
+    height: 18px;
+}
+
 .empty-gallery {
     max-width: 480px;
     margin: 40px auto;
     padding: 40px 20px;
     text-align: center;
     color: var(--muted);
-    background: var(--surface);
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
 }
 
-/* Editing page */
+/* ---------- Editing page ---------- */
 .editor {
     display: flex;
     flex-wrap: wrap;
@@ -501,11 +693,6 @@ body {
     padding: 20px;
 }
 
-.editor-side h5 {
-    margin-top: 0;
-    font-weight: 600;
-}
-
 .editor-actions {
     margin-top: 12px;
 }
@@ -513,6 +700,21 @@ body {
 .editor-upload {
     margin-top: 16px;
     text-align: left;
+}
+
+.editor-upload-hint {
+    margin-top: 8px;
+    font-size: var(--fs-sm);
+    color: var(--muted);
+}
+
+.upload-input {
+    display: none;
+}
+
+.upload-btn {
+    cursor: pointer;
+    padding: 8px 18px;
 }
 
 #videoElement {
@@ -534,6 +736,7 @@ body {
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
+    font-size: var(--fs-sm);
     font-weight: 500;
     cursor: pointer;
     transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease;
@@ -609,7 +812,7 @@ body {
     border-top: 1px solid var(--border);
 }
 
-/* Pagination */
+/* ---------- Pagination ---------- */
 .pagination-controls {
     display: flex;
     justify-content: center;
@@ -619,48 +822,22 @@ body {
 }
 
 .page-info {
+    font-size: var(--fs-sm);
     color: var(--muted);
-    font-size: .9rem;
 }
 
-/* Footer */
-.footer {
-    text-align: center;
-    padding: 18px;
-    color: var(--muted);
-    font-size: .85rem;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
+/* ---------- About ---------- */
+.about {
+    max-width: 640px;
+    margin: 40px auto;
 }
 
-/* Auth pages hide the sidebar entirely */
-body.no-sidebar .sidebar {
-    display: none;
+.about p {
+    line-height: 1.6;
+    color: var(--text);
 }
 
-/* "Create new account" call to action on the login page */
-.register-cta {
-    margin-top: 12px;
-    color: var(--accent);
-    border-color: var(--accent);
-    background: var(--surface);
-    font-weight: 600;
-}
-
-.register-cta:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent);
-}
-
-/* Activation screen: no card box, just centered content */
-.auth-plain {
-    max-width: 360px;
-    margin: 60px auto;
-    text-align: center;
-}
-
-/* Confirmation modal (custom class names to avoid Spectre's own .modal) */
+/* ---------- Confirmation modal (custom names to avoid Spectre's .modal) ---------- */
 .confirm-overlay {
     position: fixed;
     top: 0;
@@ -702,68 +879,16 @@ body.no-sidebar .sidebar {
     min-width: 100px;
 }
 
-/* Newly created post gets a brief highlight after upload */
-.post.is-highlight {
-    box-shadow: 0 0 0 2px var(--accent);
-    transition: box-shadow .3s ease;
-}
-
-/* Box-less auth screens (register, forgot, reset) */
-.auth-form {
-    max-width: 380px;
-    margin: 48px auto;
-}
-
-/* Back button, shown only on auth screens (no sidebar) */
-.auth-back {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 18px;
-    left: 18px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+/* ---------- Footer ---------- */
+.footer {
+    text-align: center;
+    padding: 18px;
+    font-size: var(--fs-sm);
     color: var(--muted);
-    z-index: 40;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
 }
 
-.auth-back.is-visible {
-    display: inline-flex;
-}
-
-.auth-back:hover {
-    background: var(--surface-2);
-    text-decoration: none;
-}
-
-.auth-back svg {
-    width: 22px;
-    height: 22px;
-}
-
-/* Password strength hint (register) */
-.password-strength {
-    margin-top: 6px;
-    min-height: 1em;
-    font-size: .78rem;
-    font-weight: 600;
-}
-
-.password-strength.weak {
-    color: var(--danger);
-}
-
-.password-strength.medium {
-    color: #c77700;
-}
-
-.password-strength.strong {
-    color: var(--success);
-}
-
-/* Footer */
 .footer a {
     color: var(--muted);
     text-decoration: none;
@@ -778,47 +903,14 @@ body.no-sidebar .sidebar {
     color: var(--border);
 }
 
-/* Brand logos on auth screens */
-.hero-logo {
-    height: 80px;
-    display: block;
-    margin-bottom: 22px;
+.ext-icon {
+    width: 12px;
+    height: 12px;
+    margin-left: 4px;
+    vertical-align: -1px;
 }
 
-.auth-logo {
-    height: 65px;
-    display: block;
-    margin: 0 0 18px;
-}
-
-/* Styled file upload (replaces the raw file input) */
-.upload-input {
-    display: none;
-}
-
-.upload-btn {
-    cursor: pointer;
-    padding: 8px 18px;
-}
-
-.editor-upload-hint {
-    margin-top: 8px;
-    font-size: .8rem;
-    color: var(--muted);
-}
-
-/* About page */
-.about {
-    max-width: 640px;
-    margin: 40px auto;
-}
-
-.about p {
-    line-height: 1.6;
-    color: var(--text);
-}
-
-/* Mobile: sidebar becomes a bottom bar */
+/* ---------- Mobile: sidebar becomes a bottom bar ---------- */
 @media (max-width: 768px) {
     body {
         flex-direction: column;
@@ -850,12 +942,12 @@ body.no-sidebar .sidebar {
         gap: 0;
     }
 
-    .sidebar-link span {
-        display: none;
-    }
-
     .sidebar-link {
         padding: 10px;
+    }
+
+    .sidebar-link span {
+        display: none;
     }
 
     .sidebar-bottom {
@@ -869,4 +961,9 @@ body.no-sidebar .sidebar {
     .auth-split {
         min-height: auto;
     }
+}
+
+/* Auth screens hide the sidebar entirely (desktop + mobile) */
+body.no-sidebar .sidebar {
+    display: none;
 }

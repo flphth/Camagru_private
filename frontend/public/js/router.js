@@ -52,7 +52,7 @@ function renderNav() {
     } else {
         nav.innerHTML =
             '<a href="/list" onclick="navigate(event, \'list\')" class="sidebar-link">' + NAV_ICONS.gallery + '<span>Gallery</span></a>' +
-            '<a href="/register" onclick="navigate(event, \'register\')" class="sidebar-link">' + NAV_ICONS.register + '<span>Register</span></a>' +
+            '<a href="/register" onclick="navigate(event, \'register\')" class="sidebar-link sidebar-bottom">' + NAV_ICONS.register + '<span>Register</span></a>' +
             '<a href="/login" onclick="navigate(event, \'login\')" class="sidebar-link">' + NAV_ICONS.login + '<span>Login</span></a>';
     }
 
@@ -96,16 +96,23 @@ document.addEventListener('DOMContentLoaded', () => {
     loadContent(initialPage);
 });
 
-// Themed confirmation dialog; resolves true/false (falls back to native confirm)
-function confirmAction(message) {
+// Themed dialog. Resolves true (confirm/OK) or false (cancel/backdrop).
+function openModal({ message, confirmText, confirmClass, showCancel }) {
     return new Promise((resolve) => {
         const overlay = document.getElementById('modal-overlay');
-        if (!overlay) { resolve(window.confirm(message)); return; }
+        if (!overlay) {
+            resolve(showCancel ? window.confirm(message) : true);
+            return;
+        }
 
         const text = document.getElementById('modal-text');
         const ok = document.getElementById('modal-confirm');
         const cancel = document.getElementById('modal-cancel');
+
         text.textContent = message;
+        ok.textContent = confirmText;
+        ok.className = 'btn ' + confirmClass;
+        cancel.style.display = showCancel ? '' : 'none';
         overlay.classList.add('is-open');
 
         const cleanup = () => {
@@ -124,27 +131,43 @@ function confirmAction(message) {
     });
 }
 
+// Confirmation before a destructive action
+function confirmAction(message) {
+    return openModal({ message, confirmText: 'Delete', confirmClass: 'btn-error', showCancel: true });
+}
+
+// Informational dialog replacing native alert()
+function alertModal(message) {
+    return openModal({ message, confirmText: 'OK', confirmClass: 'btn-primary', showCancel: false });
+}
+
 function loadContent(page) {
     const noSidebarPages = ['login', 'register', 'forgot', 'reset', 'activate', 'about'];
     document.body.classList.toggle('no-sidebar', noSidebarPages.includes(page));
 
-    // Back button: on secondary screens only (never on login); returns to login,
-    // or to the gallery from the About page
-    const backBtn = document.getElementById('auth-back');
-    if (backBtn) {
-        const showBack = ['register', 'forgot', 'reset', 'activate', 'about'].includes(page);
-        backBtn.classList.toggle('is-visible', showBack);
-        if (showBack) {
-            const target = (page === 'about') ? 'list' : 'login';
-            backBtn.setAttribute('href', '/' + target);
-            backBtn.setAttribute('onclick', "navigate(event, '" + target + "')");
-        }
-    }
-
     fetch(`${page}.html`)
         .then(response => response.text())
         .then(data => {
-            document.getElementById('content').innerHTML = data;
+            const content = document.getElementById('content');
+            content.innerHTML = data;
+
+            // Back button placed just left of the centered content block (auth screens
+            // + About). About returns to the gallery, the others to login.
+            if (['register', 'forgot', 'reset', 'activate', 'about'].includes(page)) {
+                const block = content.firstElementChild;
+                if (block) {
+                    const target = (page === 'about') ? 'list' : 'login';
+                    block.classList.add('has-back');
+                    const back = document.createElement('a');
+                    back.className = 'auth-back';
+                    back.href = '/' + target;
+                    back.setAttribute('aria-label', 'Back');
+                    back.setAttribute('onclick', "navigate(event, '" + target + "')");
+                    back.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+                    block.insertBefore(back, block.firstChild);
+                }
+            }
+
             if (page === 'home') {
                 const script = document.createElement('script');
                 script.src = '/js/webcam.js';

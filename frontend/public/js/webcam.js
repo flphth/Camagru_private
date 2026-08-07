@@ -16,7 +16,7 @@ if (typeof video === 'undefined') {
     (async () => {
         const auth = await fetchWithAuth('/api/account/check/');
         if (!auth || auth.status !== 'connected') {
-            alert('You must be logged in to access the editing page.');
+            await alertModal('You must be logged in to access the editing page.');
             history.pushState(null, '', '/login');
             loadContent('login');
         }
@@ -68,21 +68,21 @@ if (typeof video === 'undefined') {
             history.pushState(null, '', '/list?highlight=' + data.imageId);
             loadContent('list');
         } else {
-            alert((data && data.message) ? data.message : 'Image upload error. Please try again.');
+            alertModal((data && data.message) ? data.message : 'Image upload error. Please try again.');
         }
     }
 
     // Capture the current frame and send it to the server for merging
     async function uploadImage() {
         if (overlayStickers.length === 0) {
-            alert('Please select a sticker first.');
+            alertModal('Please select a sticker first.');
             return;
         }
 
         const width = canvas.width || video.videoWidth;
         const height = canvas.height || video.videoHeight;
         if (!width || !height) {
-            alert('Webcam is not ready yet. Please allow camera access and try again.');
+            alertModal('Webcam is not ready yet. Please allow camera access and try again.');
             return;
         }
 
@@ -94,7 +94,7 @@ if (typeof video === 'undefined') {
 
             await sendImage(tempCanvas.toDataURL('image/png'));
         } catch (error) {
-            alert('Image upload error. Please try again.');
+            alertModal('Image upload error. Please try again.');
         }
     }
 
@@ -123,7 +123,7 @@ if (typeof video === 'undefined') {
                 try {
                     await sendImage(tempCanvas.toDataURL('image/png'));
                 } catch (error) {
-                    alert('Image upload error. Please try again.');
+                    alertModal('Image upload error. Please try again.');
                 }
                 fileInput.value = '';
             };
@@ -193,7 +193,7 @@ if (typeof video === 'undefined') {
         if (data && data.status === 'success') {
             loadThumbnails();
         } else if (data && data.message) {
-            alert(data.message);
+            alertModal(data.message);
         }
     }
 
