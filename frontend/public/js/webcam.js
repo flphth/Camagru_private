@@ -16,42 +16,51 @@ if (typeof video === 'undefined') {
     (async () => {
         const auth = await fetchWithAuth('/api/account/check/');
         if (!auth || auth.status !== 'connected') {
-            await alertModal(t('edit.needLogin'));
-            history.pushState(null, '', '/login');
-            loadContent('login');
+            // Gently send visitors back to the public gallery
+            history.pushState(null, '', '/list');
+            loadContent('list');
+            return;
         }
+        startWebcam();
+        stickerInjector();
+        loadThumbnails();
     })();
 
-    // Request access to the webcam
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-            window.currentStream = stream;
-            video.srcObject = stream;
-        })
-        .catch((error) => {
-            console.error('Webcam access error:', error);
-        });
+    // Request access to the webcam (only for connected users)
+    function startWebcam() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                window.currentStream = stream;
+                video.srcObject = stream;
+            })
+            .catch((error) => {
+                console.error('Webcam access error:', error);
+            });
+    }
 
     // Deselect all overlaid stickers
     deselectButton.addEventListener('click', () => {
         overlayStickers = [];
         uploadButton.disabled = true;
+        document.querySelectorAll('.sticker-item.selected').forEach(el => el.classList.remove('selected'));
     });
 
-    // Overlay or remove a sticker on the preview
-    function toggleImage(source, id) {
-        const img = new Image();
-        img.id = id;
-        img.onload = () => {
-            const index = overlayStickers.findIndex(image => image.src === img.src);
+    // Overlay or remove a sticker on the preview; `el` is the sticker thumbnail in the picker
+    function toggleImage(source, id, el) {
+        const overlay = new Image();
+        overlay.id = id;
+        overlay.onload = () => {
+            const index = overlayStickers.findIndex(image => image.src === overlay.src);
             if (index !== -1) {
                 overlayStickers.splice(index, 1);
+                if (el) el.classList.remove('selected');
             } else {
-                overlayStickers.push(img);
+                overlayStickers.push(overlay);
+                if (el) el.classList.add('selected');
             }
             uploadButton.disabled = overlayStickers.length === 0;
         };
-        img.src = source;
+        overlay.src = source;
     }
 
     // Send a base64 PNG to the server, which merges the selected stickers
@@ -133,7 +142,7 @@ if (typeof video === 'undefined') {
         reader.readAsDataURL(file);
     }
 
-    // Load the superposable stickers
+    // Load the superposable stickers into the picker
     async function stickerInjector() {
         const divSticker = document.getElementById('sticker');
 
@@ -143,13 +152,21 @@ if (typeof video === 'undefined') {
 
             if (data.status === 'success') {
                 data.data.forEach(sticker => {
+                    const item = document.createElement('div');
+                    item.className = 'sticker-item';
+
                     const img = document.createElement('img');
                     img.src = sticker.imagePath;
-                    img.classList.add('sticker-image');
-                    img.addEventListener('click', () => {
-                        toggleImage(sticker.imagePath, sticker.id);
-                    });
-                    divSticker.appendChild(img);
+                    img.className = 'sticker-image';
+
+                    const check = document.createElement('span');
+                    check.className = 'sticker-check';
+                    check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+                    item.appendChild(img);
+                    item.appendChild(check);
+                    item.addEventListener('click', () => toggleImage(sticker.imagePath, sticker.id, item));
+                    divSticker.appendChild(item);
                 });
             }
         } catch (error) {
@@ -172,8 +189,9 @@ if (typeof video === 'undefined') {
             img.className = 'img-responsive';
 
             const remove = document.createElement('button');
-            remove.className = 'btn btn-error btn-sm';
-            remove.textContent = t('common.delete');
+            remove.className = 'thumbnail-delete';
+            remove.setAttribute('aria-label', t('common.delete'));
+            remove.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
             remove.addEventListener('click', () => deleteImage(image.id));
 
             wrap.appendChild(img);
@@ -198,7 +216,7 @@ if (typeof video === 'undefined') {
         }
     }
 
-    // Draw the webcam stream and overlaid stickers on the canvas
+    // Draw the webcam stream and overlaid stickers on the canvas (live preview)
     video.addEventListener('play', () => {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -216,7 +234,4 @@ if (typeof video === 'undefined') {
 
     uploadButton.addEventListener('click', uploadImage);
     fileInput.addEventListener('change', uploadFile);
-
-    stickerInjector();
-    loadThumbnails();
 }

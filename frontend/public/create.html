@@ -1,0 +1,28 @@
+<div class="editor">
+    <section class="editor-main">
+        <video id="videoElement" autoplay></video>
+        <canvas id="canvasElement"></canvas>
+        <div id="sticker"></div>
+        <div class="editor-actions">
+            <button class="btn" id="deselectImage">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <span data-i18n="edit.deselect">Deselect</span>
+            </button>
+            <button class="btn btn-primary" id="uploadImage">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span data-i18n="edit.capture">Capture</span>
+            </button>
+        </div>
+        <div class="editor-upload">
+            <label for="fileInput" class="btn upload-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span data-i18n="edit.upload">Upload an image</span>
+            </label>
+            <input type="file" id="fileInput" accept="image/png, image/jpeg" class="upload-input">
+            <div class="editor-upload-hint" data-i18n="edit.uploadHint">No webcam? Upload a picture instead.</div>
+        </div>
+    </section>
+    <aside class="editor-side">
+        <div id="thumbnails"></div>
+    </aside>
+</div>

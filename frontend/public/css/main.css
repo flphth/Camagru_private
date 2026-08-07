@@ -186,6 +186,11 @@ button, input, select, textarea {
     border-color: #cfd3de;
 }
 
+.btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
 .btn.btn-primary {
     background: var(--accent);
     border-color: var(--accent);
@@ -736,12 +741,20 @@ a:active {
 }
 
 .editor-actions {
-    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.editor-actions .btn,
+.upload-btn {
+    padding: 9px 16px;
 }
 
 .editor-upload {
     margin-top: 16px;
-    text-align: left;
+    text-align: center;
 }
 
 .editor-upload-hint {
@@ -756,7 +769,6 @@ a:active {
 
 .upload-btn {
     cursor: pointer;
-    padding: 8px 18px;
 }
 
 #videoElement {
@@ -771,64 +783,70 @@ a:active {
     background: #0f1115;
 }
 
-.imageButton {
-    margin: 5px;
-    padding: 8px 18px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: var(--fs-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease;
-}
-
-.imageButton:hover:not(:disabled) {
-    border-color: var(--accent);
-    color: var(--accent);
-}
-
-.imageButton:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
-#uploadImage:not(:disabled) {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-}
-
-#uploadImage:not(:disabled):hover {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
-    color: #fff;
-}
-
+/* Sticker picker */
 #sticker {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     margin-top: 16px;
 }
 
-.sticker-image {
-    width: 88px;
-    padding: 6px;
-    border: 1px solid var(--border);
+.sticker-item {
+    position: relative;
+    width: 84px;
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border: 2px solid var(--border);
     border-radius: var(--radius);
     background: var(--surface-2);
     cursor: pointer;
-    transition: border-color .15s ease;
+    transition: border-color .15s ease, box-shadow .15s ease;
 }
 
-.sticker-image:hover {
+.sticker-item:hover {
+    border-color: #cfd3de;
+}
+
+.sticker-item.selected {
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.sticker-image {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+.sticker-check {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.sticker-check svg {
+    width: 13px;
+    height: 13px;
+}
+
+.sticker-item.selected .sticker-check {
+    display: flex;
+}
+
+/* Side thumbnails */
 #thumbnails {
     display: flex;
     flex-direction: column;
@@ -836,6 +854,7 @@ a:active {
 }
 
 .thumbnail {
+    position: relative;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden;
@@ -847,11 +866,36 @@ a:active {
     display: block;
 }
 
-.thumbnail .btn {
-    width: 100%;
-    border-radius: 0;
+.thumbnail-delete {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: none;
-    border-top: 1px solid var(--border);
+    border-radius: 50%;
+    background: rgba(15, 17, 21, .55);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .15s ease, background .15s ease;
+}
+
+.thumbnail:hover .thumbnail-delete,
+.thumbnail:focus-within .thumbnail-delete {
+    opacity: 1;
+}
+
+.thumbnail-delete:hover {
+    background: var(--danger);
+}
+
+.thumbnail-delete svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* ---------- Pagination ---------- */

@@ -46,7 +46,7 @@ function renderNav() {
     if (getToken()) {
         nav.innerHTML =
             '<a href="/list" onclick="navigate(event, \'list\')" class="sidebar-link">' + NAV_ICONS.gallery + '<span>' + t('nav.gallery') + '</span></a>' +
-            '<a href="/home" onclick="navigate(event, \'home\')" class="sidebar-link">' + NAV_ICONS.editing + '<span>' + t('nav.create') + '</span></a>' +
+            '<a href="/create" onclick="navigate(event, \'create\')" class="sidebar-link">' + NAV_ICONS.editing + '<span>' + t('nav.create') + '</span></a>' +
             '<a href="/profile" onclick="navigate(event, \'profile\')" class="sidebar-link sidebar-bottom">' + NAV_ICONS.profile + '<span>' + t('nav.profile') + '</span></a>' +
             '<a href="/logout" onclick="logout(event)" class="sidebar-link">' + NAV_ICONS.logout + '<span>' + t('nav.logout') + '</span></a>';
     } else {
@@ -79,17 +79,17 @@ function navigate(event, page) {
 }
 
 window.onpopstate = function () {
-    const path = window.location.pathname.split('/')[1] || (getToken() ? 'home' : 'list');
+    const path = window.location.pathname.split('/')[1] || (getToken() ? 'list' : 'login');
     loadContent(path);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     initI18n();
     renderNav();
-    // Root URL: logged-in users land on the editor, visitors on the public gallery
+    // Root URL: logged-in users land on the gallery, visitors on the login page
     let initialPage = window.location.pathname.split('/')[1];
     if (!initialPage) {
-        initialPage = getToken() ? 'home' : 'list';
+        initialPage = getToken() ? 'list' : 'login';
     }
     loadContent(initialPage);
 });
@@ -146,6 +146,9 @@ function loadContent(page) {
         window.currentStream = null;
     }
 
+    // /home is an alias for the login page
+    if (page === 'home') page = 'login';
+
     const noSidebarPages = ['login', 'register', 'forgot', 'reset', 'activate', 'about'];
     document.body.classList.toggle('no-sidebar', noSidebarPages.includes(page));
 
@@ -181,7 +184,7 @@ function loadContent(page) {
 
             applyI18n(content);
 
-            if (page === 'home') {
+            if (page === 'create') {
                 const script = document.createElement('script');
                 script.src = '/js/webcam.js';
                 document.body.appendChild(script);
