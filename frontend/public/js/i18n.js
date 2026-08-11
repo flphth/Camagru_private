@@ -75,7 +75,6 @@ const translations = {
         'edit.capture': 'Capture',
         'edit.upload': 'Upload an image',
         'edit.uploadHint': 'No webcam? Upload a picture instead.',
-        'edit.mainTitle': 'Create your picture',
         'edit.mainHint': 'Pick a sticker, then capture from your webcam or upload an image.',
         'edit.historyTitle': 'Your latest pictures',
         'edit.badType': 'Only PNG or JPEG images are allowed.',
@@ -91,13 +90,11 @@ const translations = {
         'feed.unlike': 'Dislike',
         'feed.likes': ' like',
         'feed.addComment': 'Add a comment…',
-        'feed.justNow': 'Just now',
         'feed.commentFailed': 'Failed to submit comment.',
         'feed.prev': 'Previous',
         'feed.next': 'Next',
         'feed.page': 'Page',
         'feed.share': 'Share',
-        'feed.shareText': 'Check out this Camagru creation!',
         'feed.copyLink': 'Copy link',
         'feed.copied': 'Copied!',
         'feed.postNotFound': 'This post no longer exists.',
@@ -107,8 +104,7 @@ const translations = {
         'common.ok': 'OK',
         'common.deleteImage': 'Delete this image?',
         'notfound.title': 'Page not found',
-        'notfound.text': "The page you're looking for doesn't exist.",
-        'notfound.home': 'Back to gallery'
+        'notfound.text': "The page you're looking for doesn't exist."
     },
     fr: {
         'nav.gallery': 'Galerie',
@@ -172,7 +168,6 @@ const translations = {
         'edit.capture': 'Capturer',
         'edit.upload': 'Importer une image',
         'edit.uploadHint': "Pas de webcam ? Importez une photo à la place.",
-        'edit.mainTitle': 'Créez votre photo',
         'edit.mainHint': "Choisissez un filtre, puis capturez depuis la webcam ou importez une image.",
         'edit.historyTitle': 'Vos dernières photos',
         'edit.badType': 'Seules les images PNG ou JPEG sont autorisées.',
@@ -187,13 +182,11 @@ const translations = {
         'feed.unlike': 'Dislike',
         'feed.likes': ' like',
         'feed.addComment': 'Ajouter un commentaire…',
-        'feed.justNow': "À l'instant",
         'feed.commentFailed': "Échec de l'envoi du commentaire.",
         'feed.prev': 'Précédent',
         'feed.next': 'Suivant',
         'feed.page': 'Page',
         'feed.share': 'Partager',
-        'feed.shareText': 'Regarde cette création Camagru !',
         'feed.copyLink': 'Copier le lien',
         'feed.copied': 'Copié !',
         'feed.postNotFound': "Ce post n'existe plus.",
@@ -202,8 +195,7 @@ const translations = {
         'common.ok': 'OK',
         'common.deleteImage': 'Supprimer cette image ?',
         'notfound.title': 'Page introuvable',
-        'notfound.text': "La page que vous cherchez n'existe pas.",
-        'notfound.home': 'Retour à la galerie'
+        'notfound.text': "La page que vous cherchez n'existe pas."
     }
 };
 
@@ -240,7 +232,7 @@ const serverMessages = {
         'Only PNG images are allowed.': 'Seules les images PNG sont autorisées.',
         'Failed to save image.': "Échec de l'enregistrement de l'image.",
         'Failed to upload image.': "Échec de l'envoi de l'image.",
-        'Unknow error.': 'Erreur inconnue.',
+        'Unknown error.': 'Erreur inconnue.',
         'Invalid image.': 'Image invalide.',
         'Image not found.': 'Image introuvable.',
         'Image deleted.': 'Image supprimée.',
