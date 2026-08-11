@@ -4,7 +4,7 @@ require_once 'account.php';
 
 class Comment
 {
-    // Upload image and merge with stickers
+    // Add a comment to an image
     public function add($token)
     {
         $account = new Account();
@@ -48,7 +48,7 @@ class Comment
                 return ["status" => "error", "message" => "Failed to send content."];
             }
         } catch (PDOException $e) {
-            return ["status" => "error", "message" => "Unknow error."];
+            return ["status" => "error", "message" => "Unknown error."];
         }
     }
 
@@ -73,21 +73,24 @@ class Comment
         Mailer::send($author['email'], $subject, $body);
     }
 
-    // Get comments for a specific image
+    // Get comments (with their author) for a specific image
     public function get($token, $param)
     {
         $pdo = Database::getPDO();
-        $stmt = $pdo->prepare('SELECT * FROM Comment WHERE imageId = :imageId');
+        $stmt = $pdo->prepare(
+            'SELECT Comment.id, Comment.content, Comment.createdAt, User.username
+             FROM Comment JOIN User ON Comment.userId = User.id
+             WHERE Comment.imageId = :imageId
+             ORDER BY Comment.createdAt ASC, Comment.id ASC'
+        );
 
         try {
-            $stmt->execute(['imageId' => $param]);
+            $stmt->execute(['imageId' => (int)$param]);
             $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             return ["status" => "success", "comments" => $comments];
         } catch (PDOException $e) {
-            if ($e->errorInfo[1]) {
-                return ["status" => "error", "message" => "Unknow error."];
-            }
+            return ["status" => "error", "message" => "Unknown error."];
         }
     }
 }

@@ -10,6 +10,7 @@ if (typeof list === 'undefined') {
     const THUMB_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>';
 
     const SHARE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+    const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
 
     // Close any open share menu when clicking outside (bound once for the whole app)
     if (!window.__shareOutsideBound) {
@@ -149,8 +150,9 @@ if (typeof list === 'undefined') {
         // Owners can delete their own images straight from the gallery
         if (isConnected && Number(image.userId) === currentUserId) {
             const remove = document.createElement('button');
-            remove.className = 'btn btn-error btn-sm post-delete';
-            remove.textContent = t('common.delete');
+            remove.className = 'btn btn-sm post-delete';
+            remove.setAttribute('aria-label', t('common.delete'));
+            remove.innerHTML = TRASH_ICON;
             remove.addEventListener('click', () => deleteImage(image.id));
             head.appendChild(remove);
         }
@@ -208,7 +210,6 @@ if (typeof list === 'undefined') {
         wrap.className = 'share-wrap';
 
         const url = window.location.origin + '/post/' + image.id;
-        const text = t('feed.shareText');
         const enc = encodeURIComponent;
 
         const btn = document.createElement('button');
@@ -220,9 +221,9 @@ if (typeof list === 'undefined') {
         menu.className = 'share-menu';
 
         [
-            { label: 'X', href: 'https://twitter.com/intent/tweet?text=' + enc(text) + '&url=' + enc(url) },
+            { label: 'X', href: 'https://twitter.com/intent/tweet?url=' + enc(url) },
             { label: 'Facebook', href: 'https://www.facebook.com/sharer/sharer.php?u=' + enc(url) },
-            { label: 'WhatsApp', href: 'https://api.whatsapp.com/send?text=' + enc(text + ' ' + url) }
+            { label: 'WhatsApp', href: 'https://api.whatsapp.com/send?text=' + enc(url) }
         ].forEach(n => {
             const a = document.createElement('a');
             a.href = n.href;
@@ -247,7 +248,7 @@ if (typeof list === 'undefined') {
 
         btn.addEventListener('click', () => {
             if (navigator.share) {
-                navigator.share({ title: 'Camagru', text: text, url: url }).catch(() => {});
+                navigator.share({ title: 'Camagru', url: url }).catch(() => {});
             } else {
                 wrap.classList.toggle('open');
             }
@@ -286,17 +287,21 @@ if (typeof list === 'undefined') {
         return wrap;
     }
 
-    function appendComment(imageId, content, date) {
+    function appendComment(imageId, username, content, date) {
         const container = document.getElementById('comments-' + imageId);
         if (!container) return;
         const el = document.createElement('div');
         el.className = 'comment';
+        const u = document.createElement('span');
+        u.className = 'comment-user';
+        u.textContent = username;
         const c = document.createElement('span');
         c.className = 'comment-content';
         c.textContent = content;
         const d = document.createElement('span');
         d.className = 'comment-date';
         d.textContent = date;
+        el.appendChild(u);
         el.appendChild(c);
         el.appendChild(d);
         container.appendChild(el);
@@ -310,7 +315,7 @@ if (typeof list === 'undefined') {
             if (!container) return;
             container.innerHTML = '';
             if (data && Array.isArray(data.comments)) {
-                data.comments.forEach(comment => appendComment(imageId, comment.content, comment.createdAt));
+                data.comments.forEach(comment => appendComment(imageId, comment.username, comment.content, comment.createdAt));
             }
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -340,8 +345,8 @@ if (typeof list === 'undefined') {
                 body: JSON.stringify({ imageId, content })
             });
             if (data && data.status === 'success') {
-                appendComment(imageId, content, t('feed.justNow'));
                 inputEl.value = '';
+                fetchComments(imageId);
             } else {
                 alertModal((data && data.message) ? translateServerMessage(data.message) : t('feed.commentFailed'));
             }

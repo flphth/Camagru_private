@@ -96,18 +96,16 @@ class Image
                 'createdAt' => date('Y-m-d H:i:s')
             ]);
     
-            // Return the ID of the newly inserted user
+            // Return the ID of the newly inserted image
             $imageId = $pdo->lastInsertId();
-    
+
             if ($imageId > 0) {
                 return ["status" => "success", "imageId" => $imageId];
             } else {
                 return ["status" => "error", "message" => "Failed to upload image."];
             }
         } catch (PDOException $e) {
-            if ($e->errorInfo[1]) {
-                return ["status" => "error", "message" => "Unknow error."];
-            }
+            return ["status" => "error", "message" => "Unknown error."];
         }
     }
 
