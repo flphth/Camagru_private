@@ -21,6 +21,9 @@ RUN apt-get install -y \
 
 RUN printf 'sendmail_path = "/usr/bin/msmtp -t"\n' > /usr/local/etc/php/conf.d/mail.ini
 
+# Allow base64 image payloads (5 MB image ≈ 6.7 MB once base64-encoded)
+RUN printf 'post_max_size = 12M\nupload_max_filesize = 12M\n' > /usr/local/etc/php/conf.d/uploads.ini
+
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
