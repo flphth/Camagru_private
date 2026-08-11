@@ -21,6 +21,20 @@ function routeRequest()
         sendErrorResponse("Invalid class or method name");
     }
 
+    // Whitelist of routable endpoints (case-insensitive). Internal helpers such as
+    // Account::getUser are deliberately left out so they can't be reached via the API.
+    $routes = [
+        'account' => ['register', 'login', 'activate', 'requestreset', 'resetpassword', 'getprofile', 'update', 'check'],
+        'image'   => ['upload', 'getall', 'one', 'mine', 'delete'],
+        'comment' => ['add', 'get'],
+        'like'    => ['add', 'remove', 'get'],
+        'sticker' => ['all'],
+    ];
+    $classKey = strtolower($className);
+    if (!isset($routes[$classKey]) || !in_array(strtolower($methodName), $routes[$classKey], true)) {
+        sendErrorResponse("Invalid class or method name");
+    }
+
     // Check if the class and method exist
     $filePath = './classes/' . $className . '.php';
     if (!file_exists($filePath)) {
