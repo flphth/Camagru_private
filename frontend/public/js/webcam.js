@@ -33,9 +33,7 @@ if (typeof video === 'undefined') {
                 window.currentStream = stream;
                 video.srcObject = stream;
             })
-            .catch((error) => {
-                console.error('Webcam access error:', error);
-            });
+            .catch(() => {});
     }
 
     // Deselect all overlaid stickers
@@ -186,7 +184,6 @@ if (typeof video === 'undefined') {
                 });
             }
         } catch (error) {
-            console.error('Error loading stickers:', error);
         }
     }
 

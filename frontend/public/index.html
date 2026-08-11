@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="/">
 
+    <script>
+        // Apply the saved (or system-preferred) colour scheme before the first paint
+        try {
+            var savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        } catch (e) {}
+    </script>
+
     <title>Camagru</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="/css/spectre.min.css">
@@ -17,7 +27,8 @@
 <body>
     <aside class="sidebar">
         <a href="/list" onclick="navigate(event, 'list')" class="sidebar-brand" id="sidebar-brand">
-            <img src="/img/camagru-ba.png" alt="Camagru">
+            <img src="/img/camagru-ba.png" alt="Camagru" class="brand-light">
+            <img src="/img/camagru-wh.png" alt="Camagru" class="brand-dark">
         </a>
         <nav id="nav-links"></nav>
     </aside>
@@ -32,6 +43,8 @@
             </select>
             <span class="footer-sep">·</span>
             <a href="/about" onclick="navigate(event, 'about')" data-i18n="footer.about">About</a>
+            <span class="footer-sep">·</span>
+            <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode"></button>
             <span class="footer-sep">·</span>
             <a href="https://github.com/flphth/Camagru" target="_blank" rel="noopener"><span data-i18n="footer.source">Source code</span><svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
         </footer>
