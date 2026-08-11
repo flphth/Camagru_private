@@ -1,13 +1,6 @@
 <?php
 class JWT
 {
-    private $crossImport = 0;
-
-    public function __construct($crossImport = 0)
-    {
-        $this->crossImport = $crossImport;
-    }
-
     private function base64UrlEncode($data)
     {
         return strtr(base64_encode($data), '+/=', '-_,');
@@ -18,57 +11,44 @@ class JWT
         return base64_decode(strtr($data, '-_,', '+/='));
     }
 
-    public function create($payload = 0)
+    public function create($payload)
     {
-        if ($this->crossImport === 0) {
-            return 0;
-        }
-        // Creating a token header in the form of a JSON string.
-        $header = json_encode(
-            [
-                "typ" => "JWT",
-                "alg" => "HS256"
-            ]
-        );
+        $header = json_encode([
+            "typ" => "JWT",
+            "alg" => "HS256"
+        ]);
 
-        // Signature creation
         $signature = $this->generateJWTSignature($this->base64UrlEncode($header), $this->base64UrlEncode($payload));
 
-        // JWT token creation
-        $jwt = $this->base64UrlEncode($header) . "." . $this->base64UrlEncode($payload) . "." . $this->base64UrlEncode($signature);
-
-        return $jwt;
+        return $this->base64UrlEncode($header) . "." . $this->base64UrlEncode($payload) . "." . $this->base64UrlEncode($signature);
     }
 
     public function generateJWTSignature($header, $payload)
     {
-        // Signature creation
-        $signature = hash_hmac('sha256', $header . "." . $payload, getenv('JWT_SECRET'), true);
-
-        return $signature;
+        return hash_hmac('sha256', $header . "." . $payload, getenv('JWT_SECRET'), true);
     }
 
-    private function verify($token = null) {
-
-        // If the token is null or doesn't have 3 parts, return 0
+    private function verify($token = null)
+    {
         if ($token === null || count(explode(".", $token)) !== 3) {
             return false;
         }
 
-        // Split the token into its three parts 
         [$header, $payload, $signature] = array_map([$this, 'base64UrlDecode'], explode(".", $token));
 
         $payloadObj = json_decode($payload);
+        if (!$payloadObj || !isset($payloadObj->exp)) {
+            return false;
+        }
 
         $recalcSignature = $this->generateJWTSignature($this->base64UrlEncode($header), $this->base64UrlEncode($payload));
-        $tokenExpTime = filter_var($payloadObj->exp, FILTER_SANITIZE_NUMBER_INT);
 
-        // If the new signature matches the original signature and the token hasn't expired, return 1
-        return ($recalcSignature == $signature && $tokenExpTime >= time()) ? true : false;
+        // Timing-safe comparison; reject expired tokens
+        return hash_equals($recalcSignature, $signature) && (int)$payloadObj->exp >= time();
     }
 
-    public function getUserId($token = null) {
-
+    public function getUserId($token = null)
+    {
         if ($this->verify($token) === false) {
             return 0;
         }

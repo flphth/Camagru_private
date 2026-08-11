@@ -73,16 +73,16 @@ class Account
 
         // Check if the username and password match a user in the database
         $pdo = Database::getPDO();
-        $stmt = $pdo->prepare('SELECT id, passwordHash, isActiveted FROM User WHERE username = :username');
+        $stmt = $pdo->prepare('SELECT id, passwordHash, isActivated FROM User WHERE username = :username');
         $stmt->execute(['username' => $data->username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if ($user && password_verify($data->password, $user['passwordHash'])) {
             // Check if the account has been activated
-            if ((int)$user['isActiveted'] === 1) {
+            if ((int)$user['isActivated'] === 1) {
 
                 // Activate cross import
-                $jwt = new JWT(1);
+                $jwt = new JWT();
                 $payload = json_encode(
                     [
                         "iat" => time(),
@@ -109,7 +109,7 @@ class Account
         }
 
         $pdo = Database::getPDO();
-        $stmt = $pdo->prepare('SELECT id, isActiveted FROM User WHERE activationHash = :hash');
+        $stmt = $pdo->prepare('SELECT id, isActivated FROM User WHERE activationHash = :hash');
         $stmt->execute(['hash' => $hash]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -117,11 +117,11 @@ class Account
             return ["status" => "error", "message" => "Invalid activation link."];
         }
 
-        if ((int)$user['isActiveted'] === 1) {
+        if ((int)$user['isActivated'] === 1) {
             return ["status" => "success", "message" => "Account already activated. You can log in."];
         }
 
-        $stmt = $pdo->prepare('UPDATE User SET isActiveted = 1 WHERE id = :id');
+        $stmt = $pdo->prepare('UPDATE User SET isActivated = 1 WHERE id = :id');
         $stmt->execute(['id' => $user['id']]);
 
         return ["status" => "success", "message" => "Account activated. You can now log in."];
@@ -310,7 +310,7 @@ class Account
 
     public function getUser($token) {
 
-        $jwt = new JWT(1);
+        $jwt = new JWT();
         $userId = $jwt->getUserId($token);
         if ($userId > 0) {
             return $userId;
