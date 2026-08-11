@@ -63,7 +63,6 @@ if (typeof list === 'undefined') {
             fetchComments(image.id);
             fetchLikes(image.id);
         } catch (error) {
-            console.error('Error fetching post:', error);
         }
     }
 
@@ -73,7 +72,6 @@ if (typeof list === 'undefined') {
             const data = await response.json();
 
             if (!data || data.status !== 'success') {
-                console.error('Error loading images:', data);
                 return;
             }
 
@@ -116,7 +114,6 @@ if (typeof list === 'undefined') {
                 pendingHighlight = null;
             }
         } catch (error) {
-            console.error('Error fetching images:', error);
         }
     }
 
@@ -274,6 +271,7 @@ if (typeof list === 'undefined') {
             const input = document.createElement('input');
             input.className = 'form-input';
             input.type = 'text';
+            input.maxLength = 500;
             input.placeholder = t('feed.addComment');
             const send = document.createElement('button');
             send.className = 'btn btn-primary btn-sm comment-send';
@@ -318,7 +316,6 @@ if (typeof list === 'undefined') {
                 data.comments.forEach(comment => appendComment(imageId, comment.username, comment.content, comment.createdAt));
             }
         } catch (error) {
-            console.error('Error fetching comments:', error);
         }
     }
 
@@ -331,7 +328,6 @@ if (typeof list === 'undefined') {
                 if (el) el.textContent = data.likeCount;
             }
         } catch (error) {
-            console.error('Error fetching likes:', error);
         }
     }
 
@@ -351,7 +347,6 @@ if (typeof list === 'undefined') {
                 alertModal((data && data.message) ? translateServerMessage(data.message) : t('feed.commentFailed'));
             }
         } catch (error) {
-            console.error('Error:', error);
         }
     }
 

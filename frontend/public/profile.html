@@ -12,11 +12,11 @@
     <form id="profile">
         <div class="form-group">
             <label class="form-label" for="username" data-i18n="profile.username">Username</label>
-            <input class="form-input" type="text" id="username" placeholder="Username" data-i18n-ph="profile.username">
+            <input class="form-input" type="text" id="username" placeholder="Username" data-i18n-ph="profile.username" autocomplete="username" maxlength="500">
         </div>
         <div class="form-group">
             <label class="form-label" for="email" data-i18n="profile.email">Email</label>
-            <input class="form-input" type="email" id="email" placeholder="Email" data-i18n-ph="profile.email">
+            <input class="form-input" type="email" id="email" placeholder="Email" data-i18n-ph="profile.email" autocomplete="email" maxlength="500">
         </div>
         <div class="form-group">
             <label class="form-switch">
@@ -28,15 +28,15 @@
         <h3 class="profile-section-title" data-i18n="profile.changePassword">Change password</h3>
         <div class="form-group">
             <label class="form-label" for="currentPassword" data-i18n="profile.currentPassword">Current password</label>
-            <input class="form-input" type="password" id="currentPassword" placeholder="Current password" data-i18n-ph="profile.currentPassword">
+            <input class="form-input" type="password" id="currentPassword" placeholder="Current password" data-i18n-ph="profile.currentPassword" autocomplete="current-password" maxlength="500">
         </div>
         <div class="form-group">
             <label class="form-label" for="newPassword" data-i18n="profile.newPassword">New password</label>
-            <input class="form-input" type="password" id="newPassword" placeholder="New password" data-i18n-ph="profile.newPassword">
+            <input class="form-input" type="password" id="newPassword" placeholder="New password" data-i18n-ph="profile.newPassword" autocomplete="new-password" maxlength="500">
         </div>
         <div class="form-group">
             <label class="form-label" for="newPasswordConfirm" data-i18n="profile.confirmNewPassword">Confirm new password</label>
-            <input class="form-input" type="password" id="newPasswordConfirm" placeholder="Confirm new password" data-i18n-ph="profile.confirmNewPassword">
+            <input class="form-input" type="password" id="newPasswordConfirm" placeholder="Confirm new password" data-i18n-ph="profile.confirmNewPassword" autocomplete="new-password" maxlength="500">
         </div>
 
         <button class="btn btn-primary btn-block" type="submit" data-i18n="profile.save">Save changes</button>

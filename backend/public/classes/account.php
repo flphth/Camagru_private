@@ -67,7 +67,8 @@ class Account
         $json = file_get_contents('php://input');
         $data = json_decode($json);
     
-        if (!isset($data->username) || !isset($data->password)) {
+        if (!isset($data->username) || !isset($data->password)
+            || mb_strlen($data->username) > 500 || mb_strlen($data->password) > 500) {
             return ["status" => "error", "message" => "Invalid username or password."];
         }
 
@@ -143,7 +144,7 @@ class Account
     private function validatePassword($password)
     {
         // At least 8 characters, with upper and lower case letters and a digit
-        return is_string($password) && preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/', $password);
+        return is_string($password) && mb_strlen($password) <= 500 && preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/', $password);
     }
 
     public function requestReset()

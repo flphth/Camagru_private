@@ -18,7 +18,7 @@ class Comment
         $json = file_get_contents('php://input');
         $data = json_decode($json);
 
-        if (!isset($data->imageId) || !isset($data->content) || trim($data->content) === '') {
+        if (!isset($data->imageId) || !isset($data->content) || trim($data->content) === '' || mb_strlen($data->content) > 500) {
             return ["status" => "error", "message" => "Invalid comment."];
         }
 

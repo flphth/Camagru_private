@@ -5,20 +5,20 @@
     <form id="register">
         <div class="form-group">
             <label class="form-label" for="email" data-i18n="register.email">Email</label>
-            <input class="form-input" type="email" id="email" name="email" placeholder="Email" data-i18n-ph="register.email">
+            <input class="form-input" type="email" id="email" name="email" placeholder="Email" data-i18n-ph="register.email" autocomplete="email" maxlength="500">
         </div>
         <div class="form-group">
             <label class="form-label" for="username" data-i18n="register.username">Username</label>
-            <input class="form-input" type="text" id="username" name="username" placeholder="Username" data-i18n-ph="register.username">
+            <input class="form-input" type="text" id="username" name="username" placeholder="Username" data-i18n-ph="register.username" autocomplete="username" maxlength="500">
         </div>
         <div class="form-group">
             <label class="form-label" for="password" data-i18n="register.password">Password</label>
-            <input class="form-input" type="password" id="password" name="password" placeholder="Password" data-i18n-ph="register.password">
+            <input class="form-input" type="password" id="password" name="password" placeholder="Password" data-i18n-ph="register.password" autocomplete="new-password" maxlength="500">
             <div id="password-strength" class="password-strength"></div>
         </div>
         <div class="form-group">
             <label class="form-label" for="passwordConfirm" data-i18n="register.confirm">Confirm password</label>
-            <input class="form-input" type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password" data-i18n-ph="register.confirm">
+            <input class="form-input" type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password" data-i18n-ph="register.confirm" autocomplete="new-password" maxlength="500">
         </div>
         <button class="btn btn-primary btn-block" type="submit" data-i18n="register.submit">Sign up</button>
         <div id="message" class="message mt-2"></div>
