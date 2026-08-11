@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------
-// Camagru — lightweight EN/FR internationalisation
+// Camagru lightweight EN/FR internationalisation
 // ------------------------------------------------------------------
 
 const translations = {
