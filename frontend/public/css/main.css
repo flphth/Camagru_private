@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------ *
-   Camagru — Instagram-inspired light theme (layered on top of Spectre)
+   Camagru, Instagram-inspired light theme (layered on top of Spectre)
  * ------------------------------------------------------------------ */
 :root {
     /* Colors */
@@ -33,7 +33,7 @@
     --sidebar-w: 180px;
 }
 
-/* Dark theme — swaps the colour tokens when <html> carries .dark */
+/* Dark theme: swaps the colour tokens when <html> carries .dark */
 html.dark {
     color-scheme: dark;
     --bg: #0f1115;

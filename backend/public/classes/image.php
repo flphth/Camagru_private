@@ -138,7 +138,7 @@ class Image
         ];
     }
 
-    // Get a single image with its author (for the shared post page) — public
+    // Get a single image with its author (for the shared post page), public
     public function one($token, $param)
     {
         $pdo = Database::getPDO();
