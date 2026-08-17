@@ -24,4 +24,8 @@ fi
 chmod 600 /etc/msmtprc
 chown www-data:www-data /etc/msmtprc
 
+mkdir -p /var/www/html/static
+chown -R www-data:www-data /var/www/html/static
+chmod -R 0775 /var/www/html/static
+
 exec apache2-foreground

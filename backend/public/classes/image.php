@@ -76,11 +76,22 @@ class Image
         }
 
         // Save the final image (only validated content is ever written to disk)
+        $uploadDir = __DIR__ . '/../static';
+        if (!is_dir($uploadDir)) {
+            if (!mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+                return ["status" => "error", "message" => "Failed to prepare upload directory."];
+            }
+        }
+        if (!is_writable($uploadDir)) {
+            chmod($uploadDir, 0775);
+        }
+
         $fileName = 'image_' . uniqid() . '.png';
-        $fullPath = getcwd() . '/static/' . $fileName;
+        $fullPath = $uploadDir . '/' . $fileName;
 
         if (!imagepng($webcamImage, $fullPath)) {
             imagedestroy($webcamImage);
+            error_log('Failed to save image: ' . $fullPath . ' (writable=' . (int)is_writable($uploadDir) . ')');
             return ["status" => "error", "message" => "Failed to save image."];
         }
         imagedestroy($webcamImage);
@@ -95,17 +106,19 @@ class Image
                 'imagePath' => './static/' . $fileName,
                 'createdAt' => date('Y-m-d H:i:s')
             ]);
-    
-            // Return the ID of the newly inserted image
+
             $imageId = $pdo->lastInsertId();
 
             if ($imageId > 0) {
                 return ["status" => "success", "imageId" => $imageId];
-            } else {
-                return ["status" => "error", "message" => "Failed to upload image."];
             }
-        } catch (PDOException $e) {
-            return ["status" => "error", "message" => "Unknown error."];
+
+            return ["status" => "error", "message" => "Failed to upload image."];
+        } catch (Throwable $e) {
+            @unlink($fullPath);
+            error_log('Image upload DB insert failed: ' . $e->getMessage());
+            error_log($e->getTraceAsString());
+            return ["status" => "error", "message" => $e->getMessage()];
         }
     }
 
