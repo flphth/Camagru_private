@@ -1,4 +1,4 @@
-COMPOSE = docker-compose -f ./docker-compose.yml
+COMPOSE = docker compose -f ./docker-compose.yml
 
 all: build up
 
@@ -14,10 +14,11 @@ down:
 	@echo "> Stopping containers ❌"
 	@$(COMPOSE) down
 
-# Remove ONLY this project's containers and volumes (gives a fresh database)
+# Remove all project containers and all unused Docker volumes
 clean:
-	@echo "> Removing this project's containers and volumes 🧹"
-	@$(COMPOSE) down -v
+	@echo "> Removing all project containers and Docker volumes 🧹"
+	@$(COMPOSE) down -v || true
+	docker volume prune -f
 
 re:
 	@make clean

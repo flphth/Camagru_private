@@ -24,16 +24,25 @@ services:
     networks:
       - camagru_network
 
-  db:
+  dbfortytwo:
     build:
-      context: ./db
+      context: ./dbfortytwo
       args:
-        - DB_NAME
-        - DB_USER
-        - DB_PASSWORD
-        - DB_ROOT_PASSWORD
-    container_name: db
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASSWORD: ${DB_PASSWORD}
+        DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    container_name: dbfortytwo
     restart: always
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     env_file:
       - .env
     networks:
@@ -45,7 +54,7 @@ services:
     container_name: proxy
     restart: always
     ports:
-      - "80:80"
+      - "8080:80"
     env_file:
       - .env
     networks:
